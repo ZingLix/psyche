@@ -25,11 +25,14 @@ void channel::error_cb() {
 }
 
 void channel::read_cb() {
-	auto length = buffer_->read_fd(fd_);
-	if (readCallback_) readCallback_(errno, length);
+	std::size_t n = 0;
+	if (read_buffer_ != nullptr) n=read_buffer_->readFd(fd_);
+	if (readCallback_) readCallback_(errno, n);
 }
 
 void channel::write_cb() {
-	auto length = buffer_->write_fd(fd_);
-	if (writeCallback_) writeCallback_(errno, length);
+	std::size_t n = 0;
+	if (write_buffer_ != nullptr) n = write_buffer_->writeFd(fd_);
+	if (writeCallback_) writeCallback_(errno, n);
+	disableWriting();
 }

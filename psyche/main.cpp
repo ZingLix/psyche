@@ -1,16 +1,27 @@
 #include "context.h"
 #include "socket.h"
 #include "util.h"
+#include "acceptor.h"
+#include "connection.h"
+#include <iostream>
 
 int main() {
 	psyche::context context;
-	psyche::socket socket;
-	socket.bind(psyche::endpoint("127.0.0.1", 9999));
-	auto s = socket.accept();
-	std::vector<char> buffer(1024);
-	s.read(psyche::buffer(buffer),[&](psyche::error_code,std::size_t length)
+	psyche::acceptor acceptor(context, psyche::endpoint("0.0.0.0",9981));
+	std::vector<psyche::connection> connection_list;
+//	connection_list.reserve(100);
+	acceptor.accept([&](psyche::socket&& soc)  
 	{
-		s.write(psyche::buffer(buffer), nullptr);
+		connection_list.emplace_back(std::move(soc));
+		auto& con = *(connection_list.end() - 1);
+		con.receive([&](psyche::error_code,const char* str,std::size_t bytes)
+		{
+			std::string s(str, bytes);
+			con.send(s,[&](psyche::error_code)
+			{
+				std::cout << "echo :" << s << std::endl;
+			});
+		});
 	});
 	context.run();
 }

@@ -16,7 +16,7 @@ std::string address::to_string() const {
 	return std::string(ip);
 }
 
-inline in_addr_t address::raw() const {
+in_addr_t address::raw() const {
 	return addr_;
 }
 

@@ -1,20 +1,40 @@
 #include "socket.h"
+#include "context.h"
+#include "channel.h"
 #include <sys/socket.h>
 #include <netinet/in.h>
 
 using namespace psyche;
 
-socket::socket()
-	:fd_(::socket(AF_INET,SOCK_STREAM,0))
+socket::socket(context * c)
+	:fd_(::socket(AF_INET,SOCK_STREAM,0)),context_(c)
 {
 	int opt = 1;
 	setsockopt(fd_, SOL_SOCKET, SO_REUSEADDR,
 		static_cast<const void *>(&opt), sizeof(opt));
+	c->add_channel(fd_);
 }
 
-socket::socket(int fd)
-	: fd_(fd)
+psyche::socket::socket(socket&& soc) noexcept {
+	fd_ = soc.fd_;
+	context_ = soc.context_;
+	soc.reset();
+}
+
+psyche::socket::~socket() {
+	if(fd_!=0) {
+		context_->remove_channel(fd_);
+	}
+}
+
+void psyche::socket::reset() {
+	fd_ = 0;
+}
+
+socket::socket(context * c,int fd)
+	: fd_(fd),context_(c)
 {
+	c->add_channel(fd_);
 }
 
 void socket::shutdown(int how) const {
@@ -31,7 +51,7 @@ void socket::connect(const endpoint& ep) const {
 	::connect(fd_, sockaddr_cast(sockaddr_), sizeof(sockaddr_));
 }
 
-void socket::listen(int backlog = 1000) const {
+void socket::listen(int backlog) const {
 	::listen(fd_, backlog);
 }
 
@@ -39,7 +59,7 @@ psyche::socket socket::accept() const {
 	sockaddr_in addr;
 	socklen_t len = sizeof(addr);
 	auto fd = ::accept4(fd_, sockaddr_cast(addr), &len, SOCK_NONBLOCK | SOCK_CLOEXEC);
-	return socket(fd);
+	return socket(context_, fd);
 }
 
 
@@ -69,12 +89,14 @@ void socket::close() const {
 	::close(fd_);
 }
 
-void socket::read(const buffer_basic& buffer, readCallback cb) {
-	context_->set_read_callback(fd_, cb, buffer);
+void socket::read(buffer& buffer, readCallback cb) {
+	context_->get_channel(fd_)->enableReading();
+	context_->set_read_callback(fd_, cb, &buffer);
 }
 
-void psyche::socket::write(const buffer_basic& buffer, writeCallback cb) {
-	context_->set_write_callback(fd_, cb, buffer);
+void socket::write(buffer& buffer, writeCallback cb) {
+	context_->get_channel(fd_)->enableWriting();
+	context_->set_write_callback(fd_, cb, &buffer);
 
 }
 

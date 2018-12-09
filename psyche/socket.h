@@ -18,22 +18,28 @@ public:
 	using readCallback = EventCallback;
 	using writeCallback = EventCallback;
 
-	socket();
-	socket(int fd);
+	socket(context * c);
+	socket(context * c,int fd);
+	socket(const socket&) = delete;
+	socket(socket&& soc) noexcept;
+	~socket();
 	void shutdown(int how) const;
 	void bind(const endpoint& ep) const;
 	void connect(const endpoint& ep) const;
-	void listen(int backlog) const;
+	void listen(int backlog=1000) const;
 	socket accept() const;
 	void close() const;
 
 	endpoint local_endpoint() const;
 	endpoint peer_endpoint() const;
 
+	context* get_context() { return context_; }
+	int fd() { return fd_; }
 
-	void read(const buffer_basic& buffer, readCallback);
-	void write(const buffer_basic& buffer, writeCallback);
+	void read(buffer& buffer, readCallback);
+	void write(buffer& buffer, writeCallback);
 
+	void reset();
 private:
 	static inline sockaddr* sockaddr_cast(sockaddr_in& sock_in);
 	static inline sockaddr* sockaddr_cast(sockaddr_in* sock_in);

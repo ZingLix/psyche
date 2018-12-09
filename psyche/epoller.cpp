@@ -3,8 +3,9 @@
 
 using namespace psyche;
 
-epoller::epoller()
-	:epollfd_(epoll_create(kEpollEvents+1))
+epoller::epoller(context* c)
+	:epollfd_(epoll_create(kEpollEvents+1)),
+	context_(c)
 {
 }
 

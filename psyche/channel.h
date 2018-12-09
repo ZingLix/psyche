@@ -10,25 +10,23 @@ class channel
 {
 public:
 
-	channel(context* c, int fd) :context_(c), fd_(fd) {
+	channel(context* c, int fd) :context_(c), fd_(fd),events_(0),revents_(0), read_buffer_(nullptr),write_buffer_(nullptr) {
 
 	}
 
-	void setReadCallback(const EventCallback& cb, psyche::buffer_basic* buffer) {
+	void setReadCallback(const EventCallback& cb, psyche::buffer* buffer) {
 		readCallback_ = cb;
-		buffer_ = buffer;
+		read_buffer_ = buffer;
 	}
-	void setWriteCallback(const EventCallback& cb, psyche::buffer_basic* buffer) {
+	void setWriteCallback(const EventCallback& cb, psyche::buffer* buffer) {
 		writeCallback_ = cb;
-		buffer_ = buffer;
+		write_buffer_ = buffer;
 	}
-	void setCloseCallback(const EventCallback& cb, psyche::buffer_basic* buffer) {
+	void setCloseCallback(const EventCallback& cb) {
 		closeCallback_ = cb;
-		buffer_ = buffer;
 	}
-	void setErrorCallback(const EventCallback& cb, psyche::buffer_basic* buffer) {
+	void setErrorCallback(const EventCallback& cb) {
 		errorCallback_ = cb;
-		buffer_ = buffer;
 	}
 
 	void enableReading() { events_ |= kReadEvent; update(); }
@@ -61,7 +59,8 @@ private:
 	int events_;
 	int revents_;
 
-	psyche::buffer_basic* buffer_;
+	buffer* read_buffer_;
+	buffer* write_buffer_;
 
 	EventCallback readCallback_;
 	EventCallback writeCallback_;

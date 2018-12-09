@@ -4,14 +4,15 @@
 using namespace psyche;
 
 context::context()
-	:running_(false),quit_(false)
+	:running_(false),quit_(false),epoller_(std::make_unique<epoller>(this))
 {
-	
 }
 
 
 void context::set_revent(int fd, int events) {
-	channel_map_[fd]->set_revents(events);
+	auto it = channel_map_.find(fd);
+	it->second.set_revents(events);
+	//channel_map_[fd].set_revents(events);
 }
 
 void context::update_poller(int fd, int events) {
@@ -25,7 +26,8 @@ void context::run() {
 		fd_list_.clear();
 		epoller_->poll(fd_list_);
 		for(auto it:fd_list_) {
-			channel_map_[it]->handleEvent();
+			channel_map_.find(it)->second.handleEvent();
+//			channel_map_[it].handleEvent();
 		}
 	}
 	running_ = false;
@@ -35,15 +37,34 @@ void context::stop() {
 	quit_ = true;
 }
 
-void context::set_read_callback(int fd, EventCallback& cb,  psyche::buffer_basic& buffer) {
-	channel_map_[fd]->setReadCallback(cb, buffer);
+void context::set_read_callback(int fd, EventCallback cb, buffer* buffer) {
+	channel_map_.find(fd)->second.setReadCallback(cb, buffer);
+//	channel_map_[fd].setReadCallback(cb, buffer);
 }
 
-void context::set_write_callback(int fd, EventCallback& cb,  psyche::buffer_basic& buffer) {
-	channel_map_[fd]->setWriteCallback(cb, buffer);
+void context::set_write_callback(int fd, EventCallback cb, buffer* buffer) {
+	channel_map_.find(fd)->second.setWriteCallback(cb, buffer);
+//	channel_map_[fd].setWriteCallback(cb, buffer);
 }
 
-void context::set_error_callback(int fd, EventCallback& cb,  psyche::buffer_basic& buffer) {
-	channel_map_[fd]->setErrorCallback(cb, buffer);
+void context::set_error_callback(int fd, EventCallback cb, buffer* buffer) {
+	channel_map_.find(fd)->second.setErrorCallback(cb);
+//	channel_map_[fd].setErrorCallback(cb);
+}
+
+channel* context::get_channel(int fd) {
+	auto it = channel_map_.find(fd);
+	if (it != channel_map_.end()) return &(*it).second;
+	return nullptr;
+}
+
+void context::add_channel(int fd) {
+	channel_map_.insert(std::make_pair(fd, channel(this, fd)));
+	epoller_->add(fd);
+}
+
+void context::remove_channel(int fd) {
+	epoller_->remove(fd);
+	channel_map_.erase(channel_map_.find(fd));
 }
 

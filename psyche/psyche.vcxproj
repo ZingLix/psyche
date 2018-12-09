@@ -75,9 +75,11 @@
   <ImportGroup Label="PropertySheets" />
   <PropertyGroup Label="UserMacros" />
   <ItemGroup>
+    <ClInclude Include="acceptor.h" />
     <ClInclude Include="address.h" />
     <ClInclude Include="buffer.hpp" />
     <ClInclude Include="channel.h" />
+    <ClInclude Include="connection.h" />
     <ClInclude Include="context.h" />
     <ClInclude Include="endpoint.h" />
     <ClInclude Include="epoller.h" />
@@ -89,6 +91,7 @@
   <ItemGroup>
     <ClCompile Include="address.cpp" />
     <ClCompile Include="channel.cpp" />
+    <ClCompile Include="connection.cpp" />
     <ClCompile Include="context.cpp" />
     <ClCompile Include="endpoint.cpp" />
     <ClCompile Include="epoller.cpp" />
