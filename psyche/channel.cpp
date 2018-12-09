@@ -26,7 +26,13 @@ void channel::error_cb() {
 
 void channel::read_cb() {
 	std::size_t n = 0;
-	if (read_buffer_ != nullptr) n=read_buffer_->readFd(fd_);
+	if (read_buffer_ != nullptr) {
+		n = read_buffer_->readFd(fd_);
+		if(n==0) {
+			if (closeCallback_) closeCallback_(errno, 0);
+			return;
+		}
+	}
 	if (readCallback_) readCallback_(errno, n);
 }
 

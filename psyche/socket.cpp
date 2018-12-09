@@ -3,16 +3,19 @@
 #include "channel.h"
 #include <sys/socket.h>
 #include <netinet/in.h>
+#include "LogInfo.h"
 
 using namespace psyche;
 
 socket::socket(context * c)
 	:fd_(::socket(AF_INET,SOCK_STREAM,0)),context_(c)
 {
+	using namespace std::placeholders;
 	int opt = 1;
 	setsockopt(fd_, SOL_SOCKET, SO_REUSEADDR,
 		static_cast<const void *>(&opt), sizeof(opt));
 	c->add_channel(fd_);
+	c->get_channel(fd_)->setCloseCallback(std::bind(&socket::handleClose, this, _1, _2));
 }
 
 psyche::socket::socket(socket&& soc) noexcept {
@@ -34,7 +37,10 @@ void psyche::socket::reset() {
 socket::socket(context * c,int fd)
 	: fd_(fd),context_(c)
 {
+	using namespace std::placeholders;
 	c->add_channel(fd_);
+	c->get_channel(fd_)->setCloseCallback(std::bind(&socket::handleClose, this, _1, _2));
+
 }
 
 void socket::shutdown(int how) const {
@@ -100,3 +106,8 @@ void socket::write(buffer& buffer, writeCallback cb) {
 
 }
 
+void psyche::socket::handleClose(error_code ec, std::size_t) {
+	LOG_INFO << "socket " << fd_ << " closed.";
+	close();
+	context_->remove_channel(fd_);
+}

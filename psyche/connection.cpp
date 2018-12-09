@@ -1,4 +1,5 @@
 #include "connection.h"
+#include "channel.h"
 
 void psyche::connection::receive(recvCallback cb) {
 	using namespace std::placeholders;
@@ -19,4 +20,5 @@ psyche::connection::connection(connection&& other) noexcept
 	send_callback_(other.send_callback_)
 {
 	other.soc_.reset();
+	context_->get_channel(soc_.fd())->update_buffer(&read_buffer_, &write_buffer_);
 }

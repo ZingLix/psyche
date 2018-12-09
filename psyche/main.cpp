@@ -17,7 +17,7 @@ int main() {
 		con.receive([&](psyche::error_code,const char* str,std::size_t bytes)
 		{
 			std::string s(str, bytes);
-			con.send(s,[&](psyche::error_code)
+			con.send(s,[=](psyche::error_code)
 			{
 				std::cout << "echo :" << s << std::endl;
 			});

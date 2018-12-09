@@ -17,6 +17,7 @@ public:
 
 	using readCallback = EventCallback;
 	using writeCallback = EventCallback;
+	using closeCallback = EventCallback;
 
 	socket(context * c);
 	socket(context * c,int fd);
@@ -38,6 +39,7 @@ public:
 
 	void read(buffer& buffer, readCallback);
 	void write(buffer& buffer, writeCallback);
+	void handleClose(error_code ec, std::size_t);
 
 	void reset();
 private:

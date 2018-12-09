@@ -44,6 +44,10 @@ public:
 	int events() const { return events_; }
 	int fd() const { return fd_; }
 	bool isNoneEvent()const { return events() == kNoneEvent; }
+	void update_buffer(buffer* r_buffer,buffer* w_buffer) {
+		read_buffer_ = r_buffer;
+		write_buffer_ = w_buffer;
+	}
 
 private:
 	void update() {
