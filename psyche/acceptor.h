@@ -2,12 +2,13 @@
 #include "socket.h"
 #include "channel.h"
 #include <functional>
+#include "connection.h"
 
 namespace psyche {
 class acceptor
 {
 public:
-	using acceptCallback = std::function<void(socket&&)>;
+	using acceptCallback = std::function<void(std::unique_ptr<connection>&&)>;
 
 	acceptor(context& context, endpoint ep):soc_(&context) {
 		soc_.bind(ep);
@@ -28,7 +29,7 @@ private:
 		//if (ec) throw;
 		auto new_soc= soc_.accept();
 		if(accept_cb_) {
-			accept_cb_(std::move(new_soc));
+			accept_cb_(std::make_unique<connection>(std::move(new_soc)));
 		}
 	}
 

@@ -4,20 +4,20 @@
 #include "acceptor.h"
 #include "connection.h"
 #include <iostream>
+#include <memory>
 
 int main() {
 	psyche::context context;
 	psyche::acceptor acceptor(context, psyche::endpoint("0.0.0.0",9981));
-	std::vector<psyche::connection> connection_list;
-//	connection_list.reserve(100);
-	acceptor.accept([&](psyche::socket&& soc)  
+	std::vector<std::shared_ptr<psyche::connection>> connection_list;
+	acceptor.accept([&](std::unique_ptr<psyche::connection>&& conn)  
 	{
-		connection_list.emplace_back(std::move(soc));
-		auto& con = *(connection_list.end() - 1);
-		con.receive([&](psyche::error_code,const char* str,std::size_t bytes)
+		connection_list.emplace_back(std::move(conn));
+		auto con = connection_list.back();
+		con->receive([=](psyche::error_code,const char* str,std::size_t bytes)
 		{
 			std::string s(str, bytes);
-			con.send(s,[=](psyche::error_code)
+			con->send(s,[=](psyche::error_code)
 			{
 				std::cout << "echo :" << s << std::endl;
 			});

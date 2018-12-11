@@ -9,8 +9,8 @@ public:
 	using recvCallback = std::function<void(error_code, const char*, std::size_t)>;
 	using sendCallback = std::function<void(error_code)>;
 
-	connection(context& c, int fd) :context_(&c), soc_(&c,fd){}
-	connection(socket&& soc) :context_(soc.get_context()),soc_(std::move(soc)) {}
+	connection(context& c, int fd) :context_(&c), soc_(std::make_unique<socket>(&c,fd)){}
+	connection(socket&& soc) :context_(soc.get_context()),soc_(std::make_unique<socket>(std::move(soc))) {}
 	connection(const connection&) = delete;
 	connection(connection&& other) noexcept;
 	void receive(recvCallback cb);
@@ -36,7 +36,8 @@ private:
 	}
 
 	context* context_;
-	socket soc_;
+	std::unique_ptr<socket> soc_;
+	//socket soc_;
 	buffer read_buffer_;
 	buffer write_buffer_;
 	recvCallback recv_callback_;

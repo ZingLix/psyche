@@ -1,6 +1,6 @@
 #include "context.h"
 #include "channel.h"
-
+#include <cassert>
 using namespace psyche;
 
 context::context()
@@ -11,6 +11,7 @@ context::context()
 
 void context::set_revent(int fd, int events) {
 	auto it = channel_map_.find(fd);
+	assert(it != channel_map_.end());
 	it->second.set_revents(events);
 	//channel_map_[fd].set_revents(events);
 }
@@ -38,17 +39,26 @@ void context::stop() {
 }
 
 void context::set_read_callback(int fd, EventCallback cb, buffer* buffer) {
-	channel_map_.find(fd)->second.setReadCallback(cb, buffer);
+	auto it = channel_map_.find(fd);
+	assert(it != channel_map_.end());
+	it->second.setReadCallback(cb, buffer);
+//	channel_map_.find(fd)->second.setReadCallback(cb, buffer);
 //	channel_map_[fd].setReadCallback(cb, buffer);
 }
 
 void context::set_write_callback(int fd, EventCallback cb, buffer* buffer) {
-	channel_map_.find(fd)->second.setWriteCallback(cb, buffer);
+	auto it = channel_map_.find(fd);
+	assert(it != channel_map_.end());
+	it->second.setWriteCallback(cb, buffer);
+//	channel_map_.find(fd)->second.setWriteCallback(cb, buffer);
 //	channel_map_[fd].setWriteCallback(cb, buffer);
 }
 
 void context::set_error_callback(int fd, EventCallback cb, buffer* buffer) {
-	channel_map_.find(fd)->second.setErrorCallback(cb);
+	auto it = channel_map_.find(fd);
+	assert(it != channel_map_.end());
+	it->second.setErrorCallback(cb);
+	//	channel_map_.find(fd)->second.setErrorCallback(cb);
 //	channel_map_[fd].setErrorCallback(cb);
 }
 

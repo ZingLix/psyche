@@ -23,10 +23,10 @@ public:
 	void set_error_callback(int fd, EventCallback cb, buffer* buffer);
 	channel* get_channel(int fd);
 	void stop();
-
+	
 	void add_channel(int fd);
 	void remove_channel(int fd);
-
+	
 private:
 	bool running_;
 	bool quit_;

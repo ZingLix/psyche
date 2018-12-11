@@ -5,44 +5,14 @@
 
 namespace psyche
 {
-
-//class buffer_basic
-//{
-//public:
-//	virtual std::size_t read_fd(int fd) = 0;
-//	virtual std::size_t write_fd(int fd) = 0;
-//	virtual ~buffer_basic() = 0;
-//};
-//
-//template <class T>
-//class buffer;
-//
-//template <>
-//class buffer<std::vector<char>> :public buffer_basic
-//{
-//public:
-//	buffer(std::vector<char>& buf) :vector_(buf) {}
-//
-//	virtual std::size_t read_fd(int fd) const {
-//		const std::size_t n = ::read(fd, &*vector_.begin(), vector_.size());
-//		return n;
-//	}
-//
-//	virtual std::size_t write_fd(int fd) const {
-//		const std::size_t n = ::write(fd, &*vector_.begin(), vector_.size());
-//		return n;
-//	}
-//
-//private:
-//	std::vector<char>& vector_;
-//};
-//
-//buffer(std::vector<char>)->buffer<std::vector<char>>;
-
 class buffer
 {
 public:
-	buffer() :buffer_(kInitialSize), read_index_(kPrependSize), write_index_(kPrependSize) { }
+	buffer() 
+		:buffer_(kInitialSize), 
+		read_index_(kPrependSize),
+		write_index_(kPrependSize) 
+	{ }
 
 	buffer(buffer&& other) noexcept{
 		buffer_ = std::move(other.buffer_);
