@@ -1,0 +1,7 @@
+cmake_minimum_required(VERSION 2.6)
+project(psyche)
+add_definitions(-std=c++17)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ../build/)
+file(GLOB src "*.cpp")
+add_executable(psyche ${src})
+target_link_libraries(psyche pthread)
