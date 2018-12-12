@@ -1,6 +1,5 @@
 cmake_minimum_required(VERSION 2.6)
 project(psyche)
-add_definitions(-std=c++17)
 file(GLOB src "*.cpp")
 add_library(psyche ${src})
 target_link_libraries(psyche pthread)

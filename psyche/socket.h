@@ -1,5 +1,6 @@
 #pragma once
 #include <sys/socket.h>
+#include <netinet/in.h>
 #include "endpoint.h"
 #include <functional>
 #include "context.h"
@@ -22,13 +23,13 @@ public:
 	socket(context * c);
 	socket(context * c,int fd);
 	socket(const socket&) = delete;
-	socket(socket&& soc) noexcept;
+	socket(socket&& soc) noexcept = delete;
 	~socket();
 	void shutdown(int how) const;
 	void bind(const endpoint& ep) const;
 	void connect(const endpoint& ep) const;
 	void listen(int backlog=1000) const;
-	socket accept() const;
+	std::unique_ptr<socket> accept() const;
 	void close() const;
 
 	endpoint local_endpoint() const;
@@ -41,6 +42,8 @@ public:
 	void write(buffer& buffer, writeCallback);
 	void handleClose(error_code ec, std::size_t);
 
+	void setCloseCallback(std::function<void(error_code)>);
+
 	void reset();
 private:
 	static inline sockaddr* sockaddr_cast(sockaddr_in& sock_in);
@@ -48,5 +51,6 @@ private:
 
 	int fd_;
 	context* context_;
+	std::function<void(error_code)> cb;
 };
 }

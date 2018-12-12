@@ -1,20 +1,31 @@
 #pragma once
 #include "socket.h"
 #include <utility>
+#include <memory>
+#include "LogInfo.h"
 
 namespace psyche {
-class connection
+class connection:public std::enable_shared_from_this<connection>
 {
 public:
 	using recvCallback = std::function<void(error_code, const char*, std::size_t)>;
 	using sendCallback = std::function<void(error_code)>;
-
+	using closeCallback = std::function<void(error_code)>;
+	
 	connection(context& c, int fd) :context_(&c), soc_(std::make_unique<socket>(&c,fd)){}
-	connection(socket&& soc) :context_(soc.get_context()),soc_(std::make_unique<socket>(std::move(soc))) {}
+	connection(std::unique_ptr<socket>&& soc) :context_(soc->get_context()),soc_(std::move(soc)) {}
 	connection(const connection&) = delete;
 	connection(connection&& other) noexcept;
 	void receive(recvCallback cb);
 	void send(std::string msg, sendCallback cb);
+	~connection() {
+		LOG_INFO << "connection " << soc_->fd() << " start to destroy.";
+	}
+	void setCloseCallback(closeCallback cb) {
+		using namespace std::placeholders;
+		soc_->setCloseCallback(std::bind(&connection::handleClose, this, _1));
+		close_callback_ = cb;
+	}
 
 private:
 	void handleRecv(error_code ec,std::size_t bytesTransferred) {
@@ -35,12 +46,19 @@ private:
 		write_buffer_.retrieve(bytesTransferred);
 	}
 
+	void handleClose(error_code ec) {
+		recv_callback_ = nullptr;
+		send_callback_ = nullptr;
+		close_callback_(ec);
+		close_callback_ = nullptr;
+	};
+
 	context* context_;
 	std::unique_ptr<socket> soc_;
-	//socket soc_;
 	buffer read_buffer_;
 	buffer write_buffer_;
 	recvCallback recv_callback_;
 	sendCallback send_callback_;
+	closeCallback close_callback_;
 };
 }

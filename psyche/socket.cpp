@@ -18,16 +18,17 @@ socket::socket(context * c)
 	c->get_channel(fd_)->setCloseCallback(std::bind(&socket::handleClose, this, _1, _2));
 }
 
-psyche::socket::socket(socket&& soc) noexcept {
-	fd_ = soc.fd_;
-	context_ = soc.context_;
-	soc.reset();
-}
+//psyche::socket::socket(socket&& soc) noexcept {
+//	fd_ = soc.fd_;
+//	context_ = soc.context_;
+//	soc.reset();
+//}
 
 psyche::socket::~socket() {
 	if(fd_!=0) {
 		context_->remove_channel(fd_);
 	}
+	LOG_INFO << "socket " << fd_ << " destroyed.";
 }
 
 void psyche::socket::reset() {
@@ -61,11 +62,11 @@ void socket::listen(int backlog) const {
 	::listen(fd_, backlog);
 }
 
-psyche::socket socket::accept() const {
+std::unique_ptr<psyche::socket> socket::accept() const {
 	sockaddr_in addr;
 	socklen_t len = sizeof(addr);
 	auto fd = ::accept4(fd_, sockaddr_cast(addr), &len, SOCK_NONBLOCK | SOCK_CLOEXEC);
-	return socket(context_, fd);
+	return std::make_unique<socket>(context_, fd);
 }
 
 
@@ -103,11 +104,20 @@ void socket::read(buffer& buffer, readCallback cb) {
 void socket::write(buffer& buffer, writeCallback cb) {
 	context_->get_channel(fd_)->enableWriting();
 	context_->set_write_callback(fd_, cb, &buffer);
-
 }
 
 void psyche::socket::handleClose(error_code ec, std::size_t) {
 	LOG_INFO << "socket " << fd_ << " closed.";
 	close();
 	context_->remove_channel(fd_);
+	fd_ = 0;
+	if (cb) cb(ec);
+}
+
+void psyche::socket::setCloseCallback(std::function<void(error_code)> cb1) {
+	/*context_->get_channel(fd_)->setCloseCallback([=](error_code ec, std::size_t length) {
+		this->handleClose(ec, length);
+		cb(ec);
+		});*/
+	cb = cb1;
 }

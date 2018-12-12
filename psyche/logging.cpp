@@ -1,6 +1,7 @@
 #include "logging.h"
 #include <fcntl.h>
 #include <numeric>
+#include <mutex>
 
 Logger logger;
 Logger::LogLevel logLevel(Logger::DEBUG);

@@ -3,6 +3,7 @@
 #include "channel.h"
 #include <functional>
 #include "connection.h"
+#include <memory>
 
 namespace psyche {
 class acceptor
