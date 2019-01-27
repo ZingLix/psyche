@@ -40,9 +40,10 @@ public:
 
 	void read(buffer& buffer, readCallback);
 	void write(buffer& buffer, writeCallback);
-	void handleClose(error_code ec, std::size_t);
+	void handleClose();
 
-	void setCloseCallback(std::function<void(error_code)>);
+	void setCloseCallback(std::function<void()>);
+	void updateBuffer(buffer& read_buffer, buffer& write_buffer);
 
 	void reset();
 private:
@@ -51,6 +52,6 @@ private:
 
 	int fd_;
 	context* context_;
-	std::function<void(error_code)> cb;
+	std::function<void()> cb;
 };
 }

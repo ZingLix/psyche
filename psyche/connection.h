@@ -8,57 +8,66 @@ namespace psyche {
 class connection:public std::enable_shared_from_this<connection>
 {
 public:
-	using recvCallback = std::function<void(error_code, const char*, std::size_t)>;
-	using sendCallback = std::function<void(error_code)>;
-	using closeCallback = std::function<void(error_code)>;
-	
-	connection(context& c, int fd) :context_(&c), soc_(std::make_unique<socket>(&c,fd)){}
-	connection(std::unique_ptr<socket>&& soc) :context_(soc->get_context()),soc_(std::move(soc)) {}
+	using recvCallback = std::function<void(buffer&)>;
+	using sendCallback = std::function<void()>;
+	using closeCallback = std::function<void()>;
+	using errorCallback = std::function<void(error_code)>;
+
+	connection(context& c, int fd) :soc_(std::make_unique<socket>(&c,fd)),read_buffer_(std::make_unique<buffer>()),write_buffer_(std::make_unique<buffer>()){}
+	connection(std::unique_ptr<socket>&& soc) :soc_(std::move(soc)), read_buffer_(std::make_unique<buffer>()), write_buffer_(std::make_unique<buffer>()) {}
 	connection(const connection&) = delete;
 	connection(connection&& other) noexcept;
-	void receive(recvCallback cb);
+	void setReadCallback(recvCallback cb) {
+		recv_callback_ = cb;
+	}
 	void send(std::string msg, sendCallback cb);
 	~connection() {
 		LOG_INFO << "connection " << soc_->fd() << " start to destroy.";
 	}
+	void setRecvCallback(recvCallback cb) {
+		using namespace std::placeholders;
+		soc_->read(*read_buffer_,std::bind(&connection::handleRecv,this));
+		recv_callback_ = cb;
+	}
+
 	void setCloseCallback(closeCallback cb) {
 		using namespace std::placeholders;
-		soc_->setCloseCallback(std::bind(&connection::handleClose, this, _1));
+		soc_->setCloseCallback(std::bind(&connection::handleClose, this));
 		close_callback_ = cb;
 	}
 
 private:
-	void handleRecv(error_code ec,std::size_t bytesTransferred) {
-		if (ec&&ec!=4) {
+	void handleRecv() {
+		/*if (ec&&ec!=4) {
 			if (recv_callback_) recv_callback_(ec, nullptr, 0);
 			else throw;
-		}
-		if (recv_callback_) recv_callback_(ec, read_buffer_.start(), bytesTransferred);
-		read_buffer_.retrieve(bytesTransferred);
+		}*/
+		if (recv_callback_) recv_callback_(*read_buffer_);
 	}
 
-	void handleSend(error_code ec,std::size_t bytesTransferred) {
-		if(ec&&ec != 4) {
-			if (send_callback_) send_callback_(ec);
-			else throw;
-		}
-		if (send_callback_) send_callback_(ec);
-		write_buffer_.retrieve(bytesTransferred);
+	void handleSend() {
+		//if(ec&&ec != 4) {
+		//	if (send_callback_) send_callback_();
+		//	else throw;
+		//}
+		if (send_callback_) send_callback_();
 	}
 
-	void handleClose(error_code ec) {
+	void handleClose() {
+		close_callback_();
+
 		recv_callback_ = nullptr;
 		send_callback_ = nullptr;
-		close_callback_(ec);
 		close_callback_ = nullptr;
+		error_callback_ = nullptr;
 	};
 
-	context* context_;
 	std::unique_ptr<socket> soc_;
-	buffer read_buffer_;
-	buffer write_buffer_;
+	std::unique_ptr<buffer> read_buffer_;
+	std::unique_ptr<buffer> write_buffer_;
 	recvCallback recv_callback_;
 	sendCallback send_callback_;
 	closeCallback close_callback_;
+	errorCallback error_callback_;
 };
 }

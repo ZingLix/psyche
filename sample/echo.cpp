@@ -1,10 +1,9 @@
 #include "context.h"
 #include "socket.h"
-#include "util.h"
 #include "acceptor.h"
 #include "connection.h"
-#include <iostream>
 #include <memory>
+#include <algorithm>
 #include "LogInfo.h"
 
 int main() {
@@ -15,18 +14,9 @@ int main() {
 	{
 		connection_list.emplace_back(std::move(conn));
 		auto con = connection_list.back();
-		con->setCloseCallback([&,con](psyche::error_code ec)
+		con->setRecvCallback([=](psyche::buffer& buffer)
 		{
-			LOG_INFO<<"use_count: "<<	con.use_count();
-			connection_list.erase(std::find(connection_list.begin(), connection_list.end(), con));
-		});
-		con->receive([=](psyche::error_code,const char* str,std::size_t bytes)
-		{
-			std::string s(str, bytes);
-			con->send(s,[=](psyche::error_code)
-			{
-				std::cout << "echo :" << s << std::endl;
-			});
+			con->send(buffer.retrieve(),nullptr);
 		});
 	});
 	context.run();

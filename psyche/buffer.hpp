@@ -10,58 +10,105 @@ class buffer
 public:
 	buffer() 
 		:buffer_(kInitialSize), 
-		read_index_(kPrependSize),
-		write_index_(kPrependSize) 
+		begin_(kPrependSize),
+		end_(kPrependSize) 
 	{ }
 
 	buffer(buffer&& other) noexcept{
 		buffer_ = std::move(other.buffer_);
-		read_index_ = other.read_index_;
-		write_index_ = other.write_index_;
-	}
-
-	std::size_t readFd(int fd) {
-		auto n= ::read(fd, &*buffer_.begin() + write_index_, buffer_.capacity() - write_index_);
-		write_index_ += n;
-		return n;
-	}
-	
-	std::size_t writeFd(int fd) {
-		auto n = ::write(fd, &*buffer_.begin() + read_index_, write_index_-read_index_);
-		//read_index_ += n;
-		checkIndex();
-		return n;
+		begin_ = other.begin_;
+		end_ = other.end_;
 	}
 
 	const char* start() {
-		return &*buffer_.begin() + read_index_;
+		return &*buffer_.begin() + begin_;
 	}
 
 	const char* end() {
-		return &*buffer_.begin() + write_index_;
+		return &*buffer_.begin() + end_;
 	}
 
-	void retrieve(std::size_t num) {
-		read_index_ += num;
-		checkIndex();
+	std::string retrieve(std::size_t num=0) {
+		if(num==0) {
+			std::string tmp(buffer_.begin() + begin_, buffer_.begin() + end_);
+			indexInit();
+			return tmp;
+		}else {
+			std::string tmp(buffer_.begin() + begin_, buffer_.begin() + begin_+num);
+			begin_ += num;
+			checkIndex();
+			return tmp;
+		}
 	}
 
 	void checkIndex() {
-		if (read_index_ == write_index_) read_index_ = write_index_ = kPrependSize;
+		if (begin_ == end_) indexInit();
 	}
 
-	void append(std::string str) {
-		std::copy(str.begin(), str.end(), buffer_.begin() + write_index_);
-	//	buffer_.insert(buffer_.begin()+write_index_, str.begin(), str.end());
-		write_index_ += str.length();
+	void indexInit() {
+		begin_ = end_ = kPrependSize;
 	}
+
+	size_t freeSize() const {
+		return buffer_.capacity() - end_;
+	}
+
+	size_t curSize() const {
+		return end_ - begin_;
+	}
+
+	size_t readFd(int fd) {
+		char buf[1024];
+		size_t size=0;
+		while(true) {
+			size_t n = read(fd, buf, 1024);
+			if (n ==-1||n==0) break;
+			append(std::string(buf,buf+n));
+			size += n;
+		}
+		checkIndex();
+		return size;
+	}
+
+	size_t writeFd(int fd) {
+		size_t n = write(fd, &*buffer_.begin() + begin_, end_-begin_);
+		begin_ += n;
+		checkIndex();
+		return n;
+	}
+
+	void append(const std::string& str) {
+		if(freeSize()<str.length()) {
+			std::copy(buffer_.begin() + begin_, buffer_.begin() + end_, buffer_.begin());
+			if(buffer_.capacity()-curSize()<str.length()) {
+				buffer_.reserve(str.length() + begin_ - end_);
+			}
+		}
+		std::copy(str.begin(), str.end(), buffer_.begin() + end_  );
+		end_ += str.length();
+		//begin_ = 0;
+	}
+
+	void prepend(const std::string& str) {
+		if(buffer_.capacity()-curSize()<str.length()) {
+			buffer_.reserve(str.length() + buffer_.capacity());
+		}
+		if(str.length()>begin_) {
+			std::copy(str.begin() + begin_, str.begin() + end_, buffer_.begin() + str.length());
+			end_ = curSize() + str.length();
+			begin_ = str.length();
+		}
+		std::copy(str.begin(), str.end(), buffer_.begin() + begin_ - str.length());
+		begin_ -= str.length();
+	}
+
 private:
 	const std::size_t kInitialSize = 1024;
 	const std::size_t kPrependSize = 8;
 
 	std::vector<char> buffer_;
-	std::size_t read_index_;
-	std::size_t write_index_;
+	std::size_t begin_;
+	std::size_t end_;
 };
 
 }

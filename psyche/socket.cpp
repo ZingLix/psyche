@@ -15,7 +15,8 @@ socket::socket(context * c)
 	setsockopt(fd_, SOL_SOCKET, SO_REUSEADDR,
 		static_cast<const void *>(&opt), sizeof(opt));
 	c->add_channel(fd_);
-	c->get_channel(fd_)->setCloseCallback(std::bind(&socket::handleClose, this, _1, _2));
+	c->get_channel(fd_)->enableReading();
+	c->get_channel(fd_)->setCloseCallback(std::bind(&socket::handleClose, this));
 }
 
 //psyche::socket::socket(socket&& soc) noexcept {
@@ -40,7 +41,9 @@ socket::socket(context * c,int fd)
 {
 	using namespace std::placeholders;
 	c->add_channel(fd_);
-	c->get_channel(fd_)->setCloseCallback(std::bind(&socket::handleClose, this, _1, _2));
+	c->get_channel(fd_)->enableReading();
+
+	c->get_channel(fd_)->setCloseCallback(std::bind(&socket::handleClose, this));
 
 }
 
@@ -106,18 +109,23 @@ void socket::write(buffer& buffer, writeCallback cb) {
 	context_->set_write_callback(fd_, cb, &buffer);
 }
 
-void psyche::socket::handleClose(error_code ec, std::size_t) {
+void socket::handleClose() {
 	LOG_INFO << "socket " << fd_ << " closed.";
 	close();
 	context_->remove_channel(fd_);
 	fd_ = 0;
-	if (cb) cb(ec);
+	if (cb) cb();
 }
 
-void psyche::socket::setCloseCallback(std::function<void(error_code)> cb1) {
+void socket::setCloseCallback(std::function<void()> cb1) {
 	/*context_->get_channel(fd_)->setCloseCallback([=](error_code ec, std::size_t length) {
 		this->handleClose(ec, length);
 		cb(ec);
 		});*/
 	cb = cb1;
 }
+
+void socket::updateBuffer(buffer& read_buffer, buffer& write_buffer) {
+	context_->get_channel(fd_)->update_buffer(&read_buffer, &write_buffer);
+}
+

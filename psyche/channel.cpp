@@ -20,24 +20,24 @@ void channel::handleEvent() {
 }
 
 void channel::error_cb() {
-	if (errorCallback_) errorCallback_(errno,0);
+	if (errorCallback_) errorCallback_();
 }
 
 void channel::read_cb() {
 	std::size_t n = 0;
 	if (read_buffer_ != nullptr) {
 		n = read_buffer_->readFd(fd_);
-		if(n==0) {
-			if (closeCallback_) closeCallback_(errno, 0);
+		if(n==0&&errno!=EWOULDBLOCK) {
+			if (closeCallback_) closeCallback_();
 			return;
 		}
 	}
-	if (readCallback_) readCallback_(errno, n);
+	if (readCallback_) readCallback_();
 }
 
 void channel::write_cb() {
 	std::size_t n = 0;
 	if (write_buffer_ != nullptr) n = write_buffer_->writeFd(fd_);
-	if (writeCallback_) writeCallback_(errno, n);
+	if (writeCallback_) writeCallback_();
 	disableWriting();
 }
