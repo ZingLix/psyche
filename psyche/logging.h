@@ -1,7 +1,6 @@
 #pragma once
 #include <string>
 #include <thread>
-#include <unistd.h>
 #include <vector>
 #include <mutex>
 #include <condition_variable>
@@ -30,11 +29,7 @@ public:
 	template<typename T>
 	void write(const T& content);
 
-	void addLog(Buffer&& buf) {
-		std::lock_guard<std::mutex> lock(buf_mutex_);
-		buf1.push_back(buf);
-		if (buf1.size() > LOG_BUFFER_SIZE_LIMIT) cv.notify_one();
-	}
+	void addLog(Buffer&& buf);
 
 	void loop();
 

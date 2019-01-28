@@ -2,9 +2,8 @@
 #include <unordered_map>
 #include <memory>
 #include "epoller.h"
-#include "socket.h"
 #include "util.h"
-#include "buffer_.hpp"
+#include "buffer.h"
 
 namespace psyche {
 
@@ -30,7 +29,7 @@ public:
 private:
 	bool running_;
 	bool quit_;
-	std::map<int, channel> channel_map_;
+	std::unordered_map<int, channel> channel_map_;
 	std::unique_ptr<epoller> epoller_;
 	std::vector<int> fd_list_;
 };

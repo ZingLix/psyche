@@ -21,6 +21,12 @@ Logger::~Logger() {
 	::close(fd);
 }
 
+void Logger::addLog(Buffer&& buf) {
+	std::lock_guard<std::mutex> lock(buf_mutex_);
+	buf1.push_back(buf);
+	if (buf1.size() > LOG_BUFFER_SIZE_LIMIT) cv.notify_one();
+}
+
 void Logger::loop() {
 	using namespace std::chrono_literals;
 	while (looping_) {

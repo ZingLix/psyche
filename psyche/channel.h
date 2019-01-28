@@ -10,33 +10,17 @@ class channel
 {
 public:
 
-	channel(context* c, int fd) :context_(c), fd_(fd),events_(0),revents_(0), read_buffer_(nullptr),write_buffer_(nullptr) {
+	channel(context* c, int fd);
 
-	}
+	void setReadCallback(const EventCallback& cb, psyche::buffer_impl* buffer);
+	void setWriteCallback(const EventCallback& cb, psyche::buffer_impl* buffer);
+	void setCloseCallback(const EventCallback& cb);
+	void setErrorCallback(const EventCallback& cb);
 
-	void setReadCallback(const EventCallback& cb, psyche::buffer_impl* buffer) {
-		readCallback_ = cb;
-		read_buffer_ = buffer;
-	}
-	void setWriteCallback(const EventCallback& cb, psyche::buffer_impl* buffer) {
-		writeCallback_ = cb;
-		write_buffer_ = buffer;
-	}
-	void setCloseCallback(const EventCallback& cb) {
-		closeCallback_ = cb;
-	}
-	void setErrorCallback(const EventCallback& cb) {
-		errorCallback_ = cb;
-	}
-
-	void enableReading() {
-		events_ |= kReadEvent; update();
-	}
-	void disableReading() {
-		events_ &= ~kReadEvent; update();
-	}
-	void enableWriting() { events_ |= kWriteEvent; update(); }
-	void disableWriting() { events_ &= ~kWriteEvent; update(); }
+	void enableReading();
+	void disableReading();
+	void enableWriting();
+	void disableWriting();
 
 	void error_cb();
 	void read_cb();
@@ -44,19 +28,15 @@ public:
 
 	void handleEvent();
 
-	void set_revents(int revent) { revents_ = revent; }
-	int events() const { return events_; }
-	int fd() const { return fd_; }
-	bool isNoneEvent()const { return events() == kNoneEvent; }
-	void update_buffer(buffer_impl* r_buffer,buffer_impl* w_buffer) {
-		read_buffer_ = r_buffer;
-		write_buffer_ = w_buffer;
-	}
+	void set_revents(int revent);
+	int events() const;
+	int fd() const;
+	bool isNoneEvent() const;
+
+	void update_buffer(buffer_impl* r_buffer, buffer_impl* w_buffer);
 
 private:
-	void update() {
-		context_->update_poller(fd_, events());
-	}
+	void update() const;
 
 	static const int kNoneEvent;
 	static const int kReadEvent;
