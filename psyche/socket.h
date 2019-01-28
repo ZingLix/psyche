@@ -4,7 +4,7 @@
 #include "endpoint.h"
 #include <functional>
 #include "context.h"
-#include "buffer.hpp"
+#include "buffer_.hpp"
 #include "util.h"
 
 namespace psyche {

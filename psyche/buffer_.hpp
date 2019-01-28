@@ -2,7 +2,7 @@
 #include <ctime>
 #include <vector>
 #include <unistd.h>
-
+#include <string>
 namespace psyche
 {
 class buffer

@@ -5,29 +5,37 @@
 #include "LogInfo.h"
 
 namespace psyche {
+class connection;
+
+using connection_ptr = std::shared_ptr<connection>;
+
 class connection:public std::enable_shared_from_this<connection>
 {
 public:
-	using recvCallback = std::function<void(buffer&)>;
-	using sendCallback = std::function<void()>;
-	using closeCallback = std::function<void()>;
-	using errorCallback = std::function<void(error_code)>;
+	using recvCallback = std::function<void(connection_ptr,buffer&)>;
+	using sendCallback = std::function<void(connection_ptr)>;
+	using closeCallback = std::function<void(connection_ptr)>;
+	using errorCallback = std::function<void(connection_ptr,error_code)>;
 
 	connection(context& c, int fd) :soc_(std::make_unique<socket>(&c,fd)),read_buffer_(std::make_unique<buffer>()),write_buffer_(std::make_unique<buffer>()){}
 	connection(std::unique_ptr<socket>&& soc) :soc_(std::move(soc)), read_buffer_(std::make_unique<buffer>()), write_buffer_(std::make_unique<buffer>()) {}
 	connection(const connection&) = delete;
 	connection(connection&& other) noexcept;
-	void setReadCallback(recvCallback cb) {
-		recv_callback_ = cb;
-	}
+
 	void send(std::string msg, sendCallback cb);
 	~connection() {
 		LOG_INFO << "connection " << soc_->fd() << " start to destroy.";
 	}
-	void setRecvCallback(recvCallback cb) {
+	void setReadCallback(recvCallback cb) {
 		using namespace std::placeholders;
 		soc_->read(*read_buffer_,std::bind(&connection::handleRecv,this));
 		recv_callback_ = cb;
+	}
+
+	void setWriteCallback(sendCallback cb) {
+		using namespace std::placeholders;
+		soc_->write(*write_buffer_, std::bind(&connection::handleSend, this));
+		send_callback_ = cb;
 	}
 
 	void setCloseCallback(closeCallback cb) {
@@ -42,7 +50,7 @@ private:
 			if (recv_callback_) recv_callback_(ec, nullptr, 0);
 			else throw;
 		}*/
-		if (recv_callback_) recv_callback_(*read_buffer_);
+		if (recv_callback_) recv_callback_(shared_from_this(),*read_buffer_);
 	}
 
 	void handleSend() {
@@ -50,11 +58,11 @@ private:
 		//	if (send_callback_) send_callback_();
 		//	else throw;
 		//}
-		if (send_callback_) send_callback_();
+		if (send_callback_) send_callback_(shared_from_this());
 	}
 
 	void handleClose() {
-		close_callback_();
+		close_callback_(shared_from_this());
 
 		recv_callback_ = nullptr;
 		send_callback_ = nullptr;
@@ -70,4 +78,6 @@ private:
 	closeCallback close_callback_;
 	errorCallback error_callback_;
 };
+
+
 }
