@@ -273,3 +273,8 @@ compile_commands.json
 CTestTestfile.cmake
 build/
 CMakeSettings.json
+
+*.sln
+*.vcxproj
+*.vcxproj.filters
+*.vcxproj.user
