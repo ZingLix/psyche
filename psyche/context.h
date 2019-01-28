@@ -29,7 +29,7 @@ public:
 private:
 	bool running_;
 	bool quit_;
-	std::unordered_map<int, channel> channel_map_;
+	std::map<int, channel> channel_map_;
 	std::unique_ptr<epoller> epoller_;
 	std::vector<int> fd_list_;
 };

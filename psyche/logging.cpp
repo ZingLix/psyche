@@ -1,5 +1,6 @@
 #include "logging.h"
 #include <fcntl.h>
+#include <unistd.h>
 #include <numeric>
 #include <mutex>
 
