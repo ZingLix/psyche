@@ -12,13 +12,13 @@ using connection_ptr = std::shared_ptr<connection>;
 class connection:public std::enable_shared_from_this<connection>
 {
 public:
-	using recvCallback = std::function<void(connection_ptr,buffer&)>;
+	using recvCallback = std::function<void(connection_ptr,buffer_impl&)>;
 	using sendCallback = std::function<void(connection_ptr)>;
 	using closeCallback = std::function<void(connection_ptr)>;
 	using errorCallback = std::function<void(connection_ptr,error_code)>;
 
-	connection(context& c, int fd) :soc_(std::make_unique<socket>(&c,fd)),read_buffer_(std::make_unique<buffer>()),write_buffer_(std::make_unique<buffer>()){}
-	connection(std::unique_ptr<socket>&& soc) :soc_(std::move(soc)), read_buffer_(std::make_unique<buffer>()), write_buffer_(std::make_unique<buffer>()) {}
+	connection(context& c, int fd) :soc_(std::make_unique<socket>(&c,fd)),read_buffer_(std::make_unique<buffer_impl>()),write_buffer_(std::make_unique<buffer_impl>()){}
+	connection(std::unique_ptr<socket>&& soc) :soc_(std::move(soc)), read_buffer_(std::make_unique<buffer_impl>()), write_buffer_(std::make_unique<buffer_impl>()) {}
 	connection(const connection&) = delete;
 	connection(connection&& other) noexcept;
 
@@ -26,11 +26,17 @@ public:
 	~connection() {
 		LOG_INFO << "connection " << soc_->fd() << " start to destroy.";
 	}
+	
 	void setReadCallback(recvCallback cb) {
 		using namespace std::placeholders;
 		soc_->read(*read_buffer_,std::bind(&connection::handleRecv,this));
 		recv_callback_ = cb;
 	}
+
+	auto getReadCallback() const { return recv_callback_; }
+	auto getWriteCallback() const { return send_callback_; }
+	auto getCloseCallback() const { return close_callback_; }
+	auto getErrorCallback() const { return error_callback_; }
 
 	void setWriteCallback(sendCallback cb) {
 		using namespace std::placeholders;
@@ -71,13 +77,25 @@ private:
 	};
 
 	std::unique_ptr<socket> soc_;
-	std::unique_ptr<buffer> read_buffer_;
-	std::unique_ptr<buffer> write_buffer_;
+	std::unique_ptr<buffer_impl> read_buffer_;
+	std::unique_ptr<buffer_impl> write_buffer_;
 	recvCallback recv_callback_;
 	sendCallback send_callback_;
 	closeCallback close_callback_;
 	errorCallback error_callback_;
 };
 
+class connection_wrapper
+{
+public:
+	connection_wrapper(connection_ptr c) :conn(c){}
 
+	void send(std::string msg) {
+		conn->send(msg, conn->getWriteCallback());
+	}
+
+private:
+	connection_ptr conn;
+};
+using Connection = connection_wrapper;
 }

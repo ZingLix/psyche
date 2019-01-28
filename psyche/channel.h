@@ -14,11 +14,11 @@ public:
 
 	}
 
-	void setReadCallback(const EventCallback& cb, psyche::buffer* buffer) {
+	void setReadCallback(const EventCallback& cb, psyche::buffer_impl* buffer) {
 		readCallback_ = cb;
 		read_buffer_ = buffer;
 	}
-	void setWriteCallback(const EventCallback& cb, psyche::buffer* buffer) {
+	void setWriteCallback(const EventCallback& cb, psyche::buffer_impl* buffer) {
 		writeCallback_ = cb;
 		write_buffer_ = buffer;
 	}
@@ -48,7 +48,7 @@ public:
 	int events() const { return events_; }
 	int fd() const { return fd_; }
 	bool isNoneEvent()const { return events() == kNoneEvent; }
-	void update_buffer(buffer* r_buffer,buffer* w_buffer) {
+	void update_buffer(buffer_impl* r_buffer,buffer_impl* w_buffer) {
 		read_buffer_ = r_buffer;
 		write_buffer_ = w_buffer;
 	}
@@ -67,8 +67,8 @@ private:
 	int events_;
 	int revents_;
 
-	buffer* read_buffer_;
-	buffer* write_buffer_;
+	buffer_impl* read_buffer_;
+	buffer_impl* write_buffer_;
 
 	EventCallback readCallback_;
 	EventCallback writeCallback_;

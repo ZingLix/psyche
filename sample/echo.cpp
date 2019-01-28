@@ -1,10 +1,11 @@
-#include "Server.h"
+#include "psyche/Server.h"
+using namespace psyche;
 
 int main() {
-	psyche::Server s("0.0.0.0", 9981);
-	s.setReadCallback([](psyche::connection_ptr con,psyche::buffer& buffer)
+	Server s(9981);
+	s.setReadCallback([](Connection con,Buffer buffer)
 	{
-		con->send(buffer.retrieve(),nullptr);
+		con.send(buffer.retrieve());
 	});
 	s.start();
 }

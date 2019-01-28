@@ -18,9 +18,9 @@ public:
 	void run();
 	void set_revent(int fd, int events);
 	void update_poller(int fd, int events);
-	void set_read_callback(int fd, EventCallback cb, buffer* buffer);
-	void set_write_callback(int fd, EventCallback cb, buffer* buffer);
-	void set_error_callback(int fd, EventCallback cb, buffer* buffer);
+	void set_read_callback(int fd, EventCallback cb, buffer_impl* buffer);
+	void set_write_callback(int fd, EventCallback cb, buffer_impl* buffer);
+	void set_error_callback(int fd, EventCallback cb, buffer_impl* buffer);
 	channel* get_channel(int fd);
 	void stop();
 	

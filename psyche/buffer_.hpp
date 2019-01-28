@@ -5,16 +5,16 @@
 #include <string>
 namespace psyche
 {
-class buffer
+class buffer_impl
 {
 public:
-	buffer() 
+	buffer_impl() 
 		:buffer_(kInitialSize), 
 		begin_(kPrependSize),
 		end_(kPrependSize) 
 	{ }
 
-	buffer(buffer&& other) noexcept{
+	buffer_impl(buffer_impl&& other) noexcept{
 		buffer_ = std::move(other.buffer_);
 		begin_ = other.begin_;
 		end_ = other.end_;
@@ -34,6 +34,7 @@ public:
 			indexInit();
 			return tmp;
 		}else {
+			if (num > curSize()) num = curSize();
 			std::string tmp(buffer_.begin() + begin_, buffer_.begin() + begin_+num);
 			begin_ += num;
 			checkIndex();
@@ -110,5 +111,24 @@ private:
 	std::size_t begin_;
 	std::size_t end_;
 };
+
+class buffer_wrapper
+{
+public:
+	buffer_wrapper(buffer_impl& b):buffer_(&b){}
+
+	size_t available() const {
+		return buffer_->curSize();
+	}
+
+	std::string retrieve(std::size_t num = 0) {
+		return buffer_->retrieve(num);
+	}
+
+private:
+	buffer_impl* buffer_;
+};
+
+using Buffer = buffer_wrapper;
 
 }

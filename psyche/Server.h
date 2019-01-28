@@ -9,13 +9,13 @@ namespace psyche
 class Server
 {
 public:
-	using NewConnCallback = std::function<void(connection_ptr)>;
-	using ReadCallback = std::function<void(connection_ptr,buffer&)>;
-	using WriteCallback = std::function<void(connection_ptr)>;
-	using CloseCallback = std::function<void(connection_ptr)>;
-	using ErrorCallback = std::function<void(connection_ptr,error_code)>;
+	using NewConnCallback = std::function<void(Connection)>;
+	using ReadCallback = std::function<void(Connection,Buffer)>;
+	using WriteCallback = std::function<void(Connection)>;
+	using CloseCallback = std::function<void(Connection)>;
+	using ErrorCallback = std::function<void(Connection,error_code)>;
 
-	Server(const std::string& ip,std::uint16_t port)
+	Server(std::uint16_t port,const std::string& ip = "0.0.0.0")
 		:acceptor_(context_,endpoint(ip,port)) 
 	{
 		acceptor_.accept([&](std::unique_ptr<connection>&& conn)
@@ -51,16 +51,16 @@ public:
 	}
 
 private:
-	void handleRead(connection_ptr con, buffer& buffer) {
-		if (read_callback_) read_callback_(con, buffer);
+	void handleRead(connection_ptr con, buffer_impl& buffer) {
+		if (read_callback_) read_callback_(connection_wrapper(con), buffer_wrapper(buffer));
 	}
 
 	void handleWrite(connection_ptr con) {
-		if (write_callback_) write_callback_(con);
+		if (write_callback_) write_callback_(connection_wrapper(con));
 	}
 
 	void handleClose(connection_ptr con) {
-		if (close_callback_) close_callback_(con);
+		if (close_callback_) close_callback_(connection_wrapper(con));
 		connections_.erase(std::find(connections_.begin(),connections_.end(),con));
 	}
 	context context_;

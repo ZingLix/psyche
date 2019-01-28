@@ -38,12 +38,12 @@ public:
 	context* get_context() { return context_; }
 	int fd() { return fd_; }
 
-	void read(buffer& buffer, readCallback);
-	void write(buffer& buffer, writeCallback);
+	void read(buffer_impl& buffer, readCallback);
+	void write(buffer_impl& buffer, writeCallback);
 	void handleClose();
 
 	void setCloseCallback(std::function<void()>);
-	void updateBuffer(buffer& read_buffer, buffer& write_buffer);
+	void updateBuffer(buffer_impl& read_buffer, buffer_impl& write_buffer);
 
 	void reset();
 private:

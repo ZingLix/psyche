@@ -99,12 +99,12 @@ void socket::close() const {
 	::close(fd_);
 }
 
-void socket::read(buffer& buffer, readCallback cb) {
+void socket::read(buffer_impl& buffer, readCallback cb) {
 	context_->get_channel(fd_)->enableReading();
 	context_->set_read_callback(fd_, cb, &buffer);
 }
 
-void socket::write(buffer& buffer, writeCallback cb) {
+void socket::write(buffer_impl& buffer, writeCallback cb) {
 	context_->get_channel(fd_)->enableWriting();
 	context_->set_write_callback(fd_, cb, &buffer);
 }
@@ -125,7 +125,7 @@ void socket::setCloseCallback(std::function<void()> cb1) {
 	cb = cb1;
 }
 
-void socket::updateBuffer(buffer& read_buffer, buffer& write_buffer) {
+void socket::updateBuffer(buffer_impl& read_buffer, buffer_impl& write_buffer) {
 	context_->get_channel(fd_)->update_buffer(&read_buffer, &write_buffer);
 }
 

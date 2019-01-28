@@ -38,7 +38,7 @@ void context::stop() {
 	quit_ = true;
 }
 
-void context::set_read_callback(int fd, EventCallback cb, buffer* buffer) {
+void context::set_read_callback(int fd, EventCallback cb, buffer_impl* buffer) {
 	auto it = channel_map_.find(fd);
 	assert(it != channel_map_.end());
 	it->second.setReadCallback(cb, buffer);
@@ -46,7 +46,7 @@ void context::set_read_callback(int fd, EventCallback cb, buffer* buffer) {
 //	channel_map_[fd].setReadCallback(cb, buffer);
 }
 
-void context::set_write_callback(int fd, EventCallback cb, buffer* buffer) {
+void context::set_write_callback(int fd, EventCallback cb, buffer_impl* buffer) {
 	auto it = channel_map_.find(fd);
 	assert(it != channel_map_.end());
 	it->second.setWriteCallback(cb, buffer);
@@ -54,7 +54,7 @@ void context::set_write_callback(int fd, EventCallback cb, buffer* buffer) {
 //	channel_map_[fd].setWriteCallback(cb, buffer);
 }
 
-void context::set_error_callback(int fd, EventCallback cb, buffer* buffer) {
+void context::set_error_callback(int fd, EventCallback cb, buffer_impl* buffer) {
 	auto it = channel_map_.find(fd);
 	assert(it != channel_map_.end());
 	it->second.setErrorCallback(cb);
