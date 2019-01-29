@@ -21,7 +21,7 @@ void psyche::connection::setReadCallback(recvCallback cb) {
 
 void psyche::connection::setWriteCallback(sendCallback cb) {
 	using namespace std::placeholders;
-	soc_->write(*write_buffer_, std::bind(&connection::handleSend, this));
+//	soc_->write(*write_buffer_, std::bind(&connection::handleSend, this));
 	send_callback_ = cb;
 }
 
@@ -48,12 +48,12 @@ void psyche::connection::handleSend() {
 }
 
 void psyche::connection::handleClose() {
-	close_callback_(shared_from_this());
-
-	recv_callback_ = nullptr;
-	send_callback_ = nullptr;
-	close_callback_ = nullptr;
-	error_callback_ = nullptr;
+	if(close_callback_)	close_callback_(shared_from_this());
+	
+	//recv_callback_ = nullptr;
+	//send_callback_ = nullptr;
+	//close_callback_ = nullptr;
+	//error_callback_ = nullptr;
 }
 
 psyche::connection_wrapper::connection_wrapper(connection_ptr c): conn(c) {
@@ -68,9 +68,12 @@ psyche::connection::connection(context& c, int fd): soc_(std::make_unique<socket
                                                     write_buffer_(std::make_unique<buffer_impl>()) {
 }
 
-psyche::connection::connection(std::unique_ptr<socket>&& soc): soc_(std::move(soc)),
-                                                               read_buffer_(std::make_unique<buffer_impl>()),
-                                                               write_buffer_(std::make_unique<buffer_impl>()) {
+psyche::connection::connection(std::unique_ptr<socket>&& soc): soc_(std::move(soc))//,
+                                                             //  read_buffer_(std::make_unique<buffer_impl>()),
+                                                             //  write_buffer_(std::make_unique<buffer_impl>())
+{
+	read_buffer_ = std::make_unique<buffer_impl>();
+	write_buffer_ = std::make_unique<buffer_impl>();
 }
 
 psyche::connection::connection(connection&& other) noexcept

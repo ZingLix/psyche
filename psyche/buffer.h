@@ -14,7 +14,8 @@ public:
 	const char* start();
 	const char* end();
 
-	std::string retrieve(std::size_t num = 0);
+	std::string retrieve(std::size_t num);
+	std::string retrieveAll();
 
 	void checkIndex();
 	void indexInit();
@@ -43,7 +44,8 @@ public:
 	buffer_wrapper(buffer_impl& b):buffer_(&b){}
 
 	size_t available() const;
-	std::string retrieve(std::size_t num = 0) const;
+	std::string retrieve(std::size_t num) const;
+	std::string retrieveAll() const;
 
 private:
 	buffer_impl* buffer_;

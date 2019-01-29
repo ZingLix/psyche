@@ -32,5 +32,8 @@ sockaddr_in endpoint::sockaddr() const {
 	return addr;
 }
 
+std::string endpoint::to_string() const {
+	return address().to_string() + ":" + std::to_string(port());
+}
 
 

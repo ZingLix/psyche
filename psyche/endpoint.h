@@ -12,6 +12,7 @@ public:
 	endpoint(const sockaddr_in& sockaddr);
 	ip::address address() const;
 	std::uint16_t port() const;
+	std::string to_string() const;
 	sockaddr_in sockaddr() const;
 
 private:

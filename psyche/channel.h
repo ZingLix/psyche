@@ -6,7 +6,7 @@
 #include "util.h"
 
 namespace psyche {
-class channel
+class channel:std::enable_shared_from_this<channel>
 {
 public:
 

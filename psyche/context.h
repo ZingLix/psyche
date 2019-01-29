@@ -12,6 +12,8 @@ class channel;
 class context
 {
 public:
+	using channelPtr = std::shared_ptr<channel>;
+
 	context();
 
 	void run();
@@ -20,16 +22,16 @@ public:
 	void set_read_callback(int fd, EventCallback cb, buffer_impl* buffer);
 	void set_write_callback(int fd, EventCallback cb, buffer_impl* buffer);
 	void set_error_callback(int fd, EventCallback cb, buffer_impl* buffer);
-	channel* get_channel(int fd);
+	channelPtr get_channel(int fd);
 	void stop();
 	
 	void add_channel(int fd);
 	void remove_channel(int fd);
-	
 private:
+
 	bool running_;
 	bool quit_;
-	std::map<int, channel> channel_map_;
+	std::map<int, channelPtr> channel_map_;
 	std::unique_ptr<epoller> epoller_;
 	std::vector<int> fd_list_;
 };

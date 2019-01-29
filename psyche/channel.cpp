@@ -3,11 +3,12 @@
 
 using namespace psyche;
 
-const int psyche::channel::kNoneEvent = 0;
+const int channel::kNoneEvent = 0;
 const int channel::kReadEvent = EPOLLIN | EPOLLPRI;
 const int channel::kWriteEvent = EPOLLOUT;
 
 void channel::handleEvent() {
+	auto t(context_->get_channel(fd()));
 	if (revents_&(EPOLLERR)) {
 		if (errorCallback_) error_cb();
 	}
@@ -87,8 +88,11 @@ void channel::read_cb() {
 	std::size_t n = 0;
 	if (read_buffer_ != nullptr) {
 		n = read_buffer_->readFd(fd_);
-		if(n==0&&errno!=EWOULDBLOCK) {
+		if(n==0) {
 			if (closeCallback_) closeCallback_();
+			return;
+		}else if(n==-1&&errno!=EWOULDBLOCK) {
+			if (errorCallback_) errorCallback_();
 			return;
 		}
 	}
@@ -97,6 +101,7 @@ void channel::read_cb() {
 
 void channel::write_cb() {
 	std::size_t n = 0;
+	if (fd_ == 0) return;
 	if (write_buffer_ != nullptr) n = write_buffer_->writeFd(fd_);
 	if (writeCallback_) writeCallback_();
 	disableWriting();

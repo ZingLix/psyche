@@ -1,6 +1,5 @@
 #pragma once
-#include <vector>
-#include <algorithm>
+#include <set>
 #include "connection.h"
 #include "acceptor.h"
 
@@ -17,6 +16,7 @@ public:
 
 	Server(std::uint16_t port, const std::string& ip = "0.0.0.0");
 
+	void setNewConnCallback(NewConnCallback cb);
 	void setReadCallback(ReadCallback cb);
 	void setWriteCallback(WriteCallback cb);
 	void setCloseCallback(CloseCallback cb);
@@ -31,7 +31,7 @@ private:
 
 	context context_;
 	acceptor acceptor_;
-	std::vector<connection_ptr> connections_;
+	std::set<connection_ptr> connections_;
 
 	NewConnCallback new_conn_callback_;
 	ReadCallback read_callback_;

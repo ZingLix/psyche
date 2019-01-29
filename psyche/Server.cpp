@@ -3,14 +3,19 @@
 psyche::Server::Server(std::uint16_t port, const std::string& ip): acceptor_(context_, endpoint(ip, port)) {
 	acceptor_.accept([&](std::unique_ptr<connection>&& conn)
 	{
-		connections_.emplace_back(std::move(conn));
-		auto& c = connections_.back();
+		auto res= connections_.emplace(std::move(conn)).first;
+		//connections_.emplace(std::move(conn));
+		auto& c = *res;
 		using namespace std::placeholders;
 		c->setReadCallback(std::bind(&Server::handleRead, this, _1, _2));
 		c->setWriteCallback(std::bind(&Server::handleWrite, this, _1));
 		c->setCloseCallback(std::bind(&Server::HandleClose, this, _1));
 		if (new_conn_callback_) new_conn_callback_(c);
 	});
+}
+
+void psyche::Server::setNewConnCallback(NewConnCallback cb) {
+	new_conn_callback_ = cb;
 }
 
 void psyche::Server::setReadCallback(ReadCallback cb) {
@@ -43,5 +48,5 @@ void psyche::Server::handleWrite(connection_ptr con) const {
 
 void psyche::Server::HandleClose(connection_ptr con) {
 	if (close_callback_) close_callback_(connection_wrapper(con));
-	connections_.erase(std::find(connections_.begin(), connections_.end(), con));
+	connections_.erase(connections_.find(con));
 }

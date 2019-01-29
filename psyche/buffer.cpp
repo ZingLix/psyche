@@ -1,9 +1,10 @@
 #include "buffer.h"
 
 psyche::buffer_impl::buffer_impl()
-	:buffer_(kInitialSize),
+:buffer_(kInitialSize),
 	begin_(kPrependSize),
-	end_(kPrependSize) {}
+	end_(kPrependSize) {
+}
 
 psyche::buffer_impl::buffer_impl(buffer_impl&& other) noexcept {
 	buffer_ = std::move(other.buffer_);
@@ -20,18 +21,19 @@ const char* psyche::buffer_impl::end() {
 }
 
 std::string psyche::buffer_impl::retrieve(std::size_t num) {
-	if (num == 0) {
-		std::string tmp(buffer_.begin() + begin_, buffer_.begin() + end_);
-		indexInit();
-		return tmp;
-	} else {
-		if (num > curSize()) num = curSize();
-		std::string tmp(buffer_.begin() + begin_, buffer_.begin() + begin_ + num);
-		begin_ += num;
-		checkIndex();
-		return tmp;
-	}
+	if (num > curSize()) num = curSize();
+	std::string tmp(buffer_.begin() + begin_, buffer_.begin() + begin_ + num);
+	begin_ += num;
+	checkIndex();
+	return tmp;
 }
+
+std::string psyche::buffer_impl::retrieveAll() {
+	std::string tmp(buffer_.begin() + begin_, buffer_.begin() + end_);
+	indexInit();
+	return tmp;
+}
+
 
 void psyche::buffer_impl::checkIndex() {
 	if (begin_ == end_) indexInit();
@@ -51,15 +53,12 @@ size_t psyche::buffer_impl::curSize() const {
 
 size_t psyche::buffer_impl::readFd(int fd) {
 	char buf[1024];
-	size_t size = 0;
-	while (true) {
-		size_t n = read(fd, buf, 1024);
-		if (n == -1 || n == 0) break;
+	size_t n = read(fd, buf, sizeof buf);
+	if (n != -1 && n != 0) {
 		append(std::string(buf, buf + n));
-		size += n;
+		checkIndex();
 	}
-	checkIndex();
-	return size;
+	return n;
 }
 
 size_t psyche::buffer_impl::writeFd(int fd) {
@@ -100,4 +99,8 @@ size_t psyche::buffer_wrapper::available() const {
 
 std::string psyche::buffer_wrapper::retrieve(std::size_t num) const {
 	return buffer_->retrieve(num);
+}
+
+std::string psyche::buffer_wrapper::retrieveAll() const {
+	return buffer_->retrieveAll();
 }

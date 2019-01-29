@@ -34,6 +34,9 @@ public:
 	void setWriteCallback(sendCallback cb);
 	void setCloseCallback(closeCallback cb);
 
+	endpoint local_endpoint()const { return soc_->local_endpoint(); }
+	endpoint peer_endpoint() const { return soc_->peer_endpoint(); }
+
 private:
 	void handleRecv();
 	void handleSend();
@@ -54,6 +57,9 @@ public:
 	connection_wrapper(connection_ptr c);
 
 	void send(std::string msg) const;
+
+	endpoint local_endpoint()const { return conn->local_endpoint(); }
+	endpoint peer_endpoint() const { return conn->peer_endpoint(); }
 
 private:
 	connection_ptr conn;

@@ -115,6 +115,8 @@ void socket::handleClose() {
 	context_->remove_channel(fd_);
 	fd_ = 0;
 	if (cb) cb();
+	
+	
 }
 
 void socket::setCloseCallback(std::function<void()> cb1) {
