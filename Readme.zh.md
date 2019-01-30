@@ -16,12 +16,12 @@ psyche 是在 Linux 下利用现代 C++ （C++11 以及更高）开发的异步�
 using namespace psyche;
 
 int main() {
-	Server s(9981);
-	s.setReadCallback([](Connection con, Buffer buffer)
-	{
-		con.send(buffer.retrieve());
-	});
-	s.start();
+    Server s(9981);
+    s.setReadCallback([](Connection con, Buffer buffer)
+    {
+        con.send(buffer.retrieve());
+    });
+    s.start();
 }
 ```
 
@@ -33,24 +33,24 @@ int main() {
 using namespace psyche;
 
 int main() {
-	Server s(9981);
-	s.setNewConnCallback([](Connection con)
-	{
-		LOG_INFO << "New connect from " << con.peer_endpoint().to_string() << ".";
-	});
-	s.setReadCallback([](Connection con,Buffer buffer)
-	{
-		auto msg(buffer.retrieveAll());
-		LOG_INFO << "Received from " << con.peer_endpoint().to_string()
-			<< " :" << msg;
-		con.send(msg);
-	});
-	s.setCloseCallback([](Connection con)
-	{
-		LOG_INFO << con.peer_endpoint().address().to_string() << ":"
-			<< con.peer_endpoint().port() << " connection closed";
-	});
-	s.start();
+    Server s(9981);
+    s.setNewConnCallback([](Connection con)
+    {
+        LOG_INFO << "New connect from " << con.peer_endpoint().to_string() << ".";
+    });
+    s.setReadCallback([](Connection con,Buffer buffer)
+    {
+        auto msg(buffer.retrieveAll());
+        LOG_INFO << "Received from " << con.peer_endpoint().to_string()
+            << " :" << msg;
+        con.send(msg);
+    });
+    s.setCloseCallback([](Connection con)
+    {
+        LOG_INFO << con.peer_endpoint().address().to_string() << ":"
+            << con.peer_endpoint().port() << " connection closed";
+    });
+    s.start();
 }
 ```
 
