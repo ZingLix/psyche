@@ -1,4 +1,4 @@
-中文 | [English](https://github.com/ZingLix/psyche/blob/master/Readme.md)
+中文 | [English](https://github.com/ZingLix/psyche)
 
 # psyche
 
@@ -59,6 +59,8 @@ int main() {
 所有回调函数都会提供一个连接的智能指针 `Connection`，除了 `Server` 用户也可以管理它的生命周期。
 
 日志库提供了 `LOG_XXX` 形式多级别的，类似于 `std::cout` 的使用方式。
+
+[sample 文件夹](https://github.com/ZingLix/psyche/tree/master/sample)中会有更多示例。
 
 ## 安装
 
