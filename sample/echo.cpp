@@ -6,12 +6,12 @@ int main() {
 	Server s(9981);
 	s.setNewConnCallback([](Connection con)
 	{
-		std::cout << "New connect from " << con.peer_endpoint().to_string() << "."<<std::endl;
+		LOG_INFO << "New connect from " << con.peer_endpoint().to_string() << ".";
 	});
 	s.setReadCallback([](Connection con,Buffer buffer)
 	{
 		auto msg(buffer.retrieveAll());
-		std::cout << "Received from " << con.peer_endpoint().to_string()
+		LOG_INFO << "Received from " << con.peer_endpoint().to_string()
 			<< " :" << msg;
 		con.send(msg);
 	});

@@ -13,7 +13,7 @@ class address
 public:
 	address(const char* addr);
 	address(const std::string addr);
-	address(uint32_t addr) :addr_(htonl(addr)) {}
+	address(uint32_t addr) :addr_(addr) {}
 
 	std::string to_string() const;
 	in_addr_t raw() const;
