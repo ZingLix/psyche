@@ -16,7 +16,7 @@ void context::set_revent(int fd, int events) {
 	//channel_map_[fd].set_revents(events);
 }
 
-void context::update_poller(int fd, int events) {
+void context::update_poller(int fd, int events) const {
 	epoller_->update(fd, events);
 }
 
@@ -40,23 +40,23 @@ void context::stop() {
 	quit_ = true;
 }
 
-void context::set_read_callback(int fd, EventCallback cb, buffer_impl* buffer) {
+void context::set_read_callback(int fd, EventCallback cb) {
 	auto it = channel_map_.find(fd);
 	assert(it != channel_map_.end());
-	it->second->setReadCallback(cb, buffer);
+	it->second->setReadCallback(cb);
 //	channel_map_.find(fd)->second.setReadCallback(cb, buffer);
 //	channel_map_[fd].setReadCallback(cb, buffer);
 }
 
-void context::set_write_callback(int fd, EventCallback cb, buffer_impl* buffer) {
+void context::set_write_callback(int fd, EventCallback cb) {
 	auto it = channel_map_.find(fd);
 	assert(it != channel_map_.end());
-	it->second->setWriteCallback(cb, buffer);
+	it->second->setWriteCallback(cb);
 //	channel_map_.find(fd)->second.setWriteCallback(cb, buffer);
 //	channel_map_[fd].setWriteCallback(cb, buffer);
 }
 
-void context::set_error_callback(int fd, EventCallback cb, buffer_impl* buffer) {
+void context::set_error_callback(int fd, EventCallback cb) {
 	auto it = channel_map_.find(fd);
 	assert(it != channel_map_.end());
 	it->second->setErrorCallback(cb);
@@ -71,8 +71,8 @@ context::channelPtr context::get_channel(int fd) {
 }
 
 void context::add_channel(int fd) {
-	channel_map_.insert(std::make_pair(fd, std::make_shared<channel>(this, fd)));
 	epoller_->add(fd);
+	channel_map_.insert(std::make_pair(fd, std::make_shared<channel>(this, fd)));
 }
 
 void context::remove_channel(int fd) {

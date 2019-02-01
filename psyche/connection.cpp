@@ -10,7 +10,7 @@ void psyche::connection::send(std::string msg, sendCallback cb) {
 }
 
 psyche::connection::~connection() {
-	LOG_INFO << "connection " << soc_->fd() << " start to destroy.";
+	LOG_DEBUG << "connection " << soc_->fd() << " start to destroy.";
 }
 
 void psyche::connection::setReadCallback(recvCallback cb) {
@@ -36,6 +36,11 @@ void psyche::connection::handleRecv() {
 		if (recv_callback_) recv_callback_(ec, nullptr, 0);
 		else throw;
 	}*/
+	auto n = read_buffer_->readFd(soc_->fd());
+	if(n==0) {
+		handleClose();
+		return;
+	}
 	if (recv_callback_) recv_callback_(shared_from_this(), *read_buffer_);
 }
 
@@ -44,6 +49,7 @@ void psyche::connection::handleSend() {
 	//	if (send_callback_) send_callback_();
 	//	else throw;
 	//}
+	write_buffer_->writeFd(soc_->fd());
 	if (send_callback_) send_callback_(shared_from_this());
 }
 
@@ -83,5 +89,4 @@ psyche::connection::connection(connection&& other) noexcept
 	recv_callback_(other.recv_callback_),
 	send_callback_(other.send_callback_)
 {
-	soc_->updateBuffer(*read_buffer_, *write_buffer_);
 }

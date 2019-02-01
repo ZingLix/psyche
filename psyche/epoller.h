@@ -13,6 +13,7 @@ public:
 	static const int kEpollEvents = 100;
 
 	epoller(context* c);
+	~epoller();
 	void add(int fd);
 	void remove(int fd);
 	void update(int fd, int events);

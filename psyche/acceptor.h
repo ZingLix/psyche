@@ -19,8 +19,7 @@ public:
 		soc_.listen(backlog);
 		using namespace std::placeholders;
 		soc_.get_context()->set_read_callback(soc_.fd(),
-		                                      std::bind(&acceptor::handleNewConn,this),
-		                                      nullptr);
+		                                      std::bind(&acceptor::handleNewConn,this));
 		accept_cb_ = cb;
 		soc_.get_context()->get_channel(soc_.fd())->enableReading();
 	}

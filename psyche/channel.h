@@ -12,8 +12,8 @@ public:
 
 	channel(context* c, int fd);
 
-	void setReadCallback(const EventCallback& cb, psyche::buffer_impl* buffer);
-	void setWriteCallback(const EventCallback& cb, psyche::buffer_impl* buffer);
+	void setReadCallback(const EventCallback& cb);
+	void setWriteCallback(const EventCallback& cb);
 	void setCloseCallback(const EventCallback& cb);
 	void setErrorCallback(const EventCallback& cb);
 
@@ -25,15 +25,13 @@ public:
 	void error_cb();
 	void read_cb();
 	void write_cb();
-
+	void close_cb();
 	void handleEvent();
 
 	void set_revents(int revent);
 	int events() const;
 	int fd() const;
 	bool isNoneEvent() const;
-
-	void update_buffer(buffer_impl* r_buffer, buffer_impl* w_buffer);
 
 private:
 	void update() const;
@@ -46,9 +44,6 @@ private:
 	const int fd_;
 	int events_;
 	int revents_;
-
-	buffer_impl* read_buffer_;
-	buffer_impl* write_buffer_;
 
 	EventCallback readCallback_;
 	EventCallback writeCallback_;

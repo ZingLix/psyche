@@ -9,10 +9,15 @@ epoller::epoller(context* c)
 {
 }
 
+epoller::~epoller() {
+	::close(epollfd_);
+}
+
+
 void epoller::add(int fd) {
 	epoll_event ev;
 	ev.data.fd = fd;
-	ev.events = EPOLLERR;
+	ev.events = 0;
 	epoll_ctl(epollfd_, EPOLL_CTL_ADD, fd, &ev);
 }
 

@@ -43,7 +43,6 @@ public:
 	void handleClose();
 
 	void setCloseCallback(std::function<void()>);
-	void updateBuffer(buffer_impl& read_buffer, buffer_impl& write_buffer);
 
 	void reset();
 private:

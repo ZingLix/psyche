@@ -26,10 +26,12 @@ socket::socket(context * c)
 //}
 
 psyche::socket::~socket() {
+	LOG_DEBUG << "socket " << fd_ << " destroyed.";
 	if(fd_!=0) {
+		close();
 		context_->remove_channel(fd_);
+		fd_ = 0;
 	}
-	LOG_INFO << "socket " << fd_ << " destroyed.";
 }
 
 void psyche::socket::reset() {
@@ -42,9 +44,7 @@ socket::socket(context * c,int fd)
 	using namespace std::placeholders;
 	c->add_channel(fd_);
 	c->get_channel(fd_)->enableReading();
-
 	c->get_channel(fd_)->setCloseCallback(std::bind(&socket::handleClose, this));
-
 }
 
 void socket::shutdown(int how) const {
@@ -101,33 +101,19 @@ void socket::close() const {
 
 void socket::read(buffer_impl& buffer, readCallback cb) {
 	context_->get_channel(fd_)->enableReading();
-	context_->set_read_callback(fd_, cb, &buffer);
+	context_->set_read_callback(fd_, cb);
 }
 
 void socket::write(buffer_impl& buffer, writeCallback cb) {
 	context_->get_channel(fd_)->enableWriting();
-	context_->set_write_callback(fd_, cb, &buffer);
+	context_->set_write_callback(fd_, cb);
 }
 
 void socket::handleClose() {
-	LOG_INFO << "socket " << fd_ << " closed.";
-	close();
-	context_->remove_channel(fd_);
-	fd_ = 0;
+	LOG_DEBUG << "socket " << fd_ << " closed.";
 	if (cb) cb();
-	
-	
 }
 
-void socket::setCloseCallback(std::function<void()> cb1) {
-	/*context_->get_channel(fd_)->setCloseCallback([=](error_code ec, std::size_t length) {
-		this->handleClose(ec, length);
-		cb(ec);
-		});*/
-	cb = cb1;
+void socket::setCloseCallback(std::function<void()> cb) {
+	this->cb = cb;
 }
-
-void socket::updateBuffer(buffer_impl& read_buffer, buffer_impl& write_buffer) {
-	context_->get_channel(fd_)->update_buffer(&read_buffer, &write_buffer);
-}
-

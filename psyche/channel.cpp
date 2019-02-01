@@ -11,6 +11,11 @@ void channel::handleEvent() {
 	auto t(context_->get_channel(fd()));
 	if (revents_&(EPOLLERR)) {
 		if (errorCallback_) error_cb();
+		return;
+	}
+	if(revents_&EPOLLRDHUP) {
+		if (closeCallback_) close_cb();
+		return;
 	}
 	if (revents_&(EPOLLIN | EPOLLPRI)) {
 		if (readCallback_) read_cb();
@@ -28,28 +33,20 @@ int channel::fd() const { return fd_; }
 
 bool channel::isNoneEvent() const { return events() == kNoneEvent; }
 
-void channel::update_buffer(buffer_impl* r_buffer, buffer_impl* w_buffer) {
-	read_buffer_ = r_buffer;
-	write_buffer_ = w_buffer;
-}
-
 void channel::update() const {
 	context_->update_poller(fd_, events());
 }
 
-channel::channel(context* c, int fd): context_(c), fd_(fd), events_(0), revents_(0), read_buffer_(nullptr),
-                                      write_buffer_(nullptr) {
-
+channel::channel(context* c, int fd): context_(c), fd_(fd), events_(EPOLLERR|EPOLLRDHUP), revents_(0) {
+	update();
 }
 
-void channel::setReadCallback(const EventCallback& cb, psyche::buffer_impl* buffer) {
+void channel::setReadCallback(const EventCallback& cb) {
 	readCallback_ = cb;
-	read_buffer_ = buffer;
 }
 
-void channel::setWriteCallback(const EventCallback& cb, psyche::buffer_impl* buffer) {
+void channel::setWriteCallback(const EventCallback& cb) {
 	writeCallback_ = cb;
-	write_buffer_ = buffer;
 }
 
 void channel::setCloseCallback(const EventCallback& cb) {
@@ -86,23 +83,15 @@ void channel::error_cb() {
 
 void channel::read_cb() {
 	std::size_t n = 0;
-	if (read_buffer_ != nullptr) {
-		n = read_buffer_->readFd(fd_);
-		if(n==0) {
-			if (closeCallback_) closeCallback_();
-			return;
-		}else if(n==-1&&errno!=EWOULDBLOCK) {
-			if (errorCallback_) errorCallback_();
-			return;
-		}
-	}
 	if (readCallback_) readCallback_();
 }
 
 void channel::write_cb() {
-	std::size_t n = 0;
 	if (fd_ == 0) return;
-	if (write_buffer_ != nullptr) n = write_buffer_->writeFd(fd_);
 	if (writeCallback_) writeCallback_();
 	disableWriting();
+}
+
+void channel::close_cb() {
+	if (closeCallback_) closeCallback_();
 }
