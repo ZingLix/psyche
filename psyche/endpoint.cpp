@@ -11,7 +11,7 @@ endpoint::endpoint(const std::string& ip, std::uint16_t port)
 
 endpoint::endpoint(const ::sockaddr_in& sockaddr)
 	:address_(sockaddr.sin_addr.s_addr),
-	port_(sockaddr.sin_port)
+	port_(ntohs(sockaddr.sin_port))
 {
 }
 
