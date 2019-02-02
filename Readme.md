@@ -13,7 +13,7 @@ psyche is a modern C++ (C++11 and above) non-blocking network library for Linux 
 A simple echo server.
 
 ``` cpp
-#include "psyche/Server.h"
+#include "psyche/psyche.h"
 using namespace psyche;
 
 int main() {
@@ -29,7 +29,7 @@ int main() {
 And an echo server which considers the complete lifetime of the connection.
 
 ``` cpp
-#include "psyche/Server.h"
+#include "psyche/psyche.h"
 using namespace psyche;
 
 int main() {
@@ -69,6 +69,14 @@ cmake .
 make
 sudo make install
 ```
+
+Or if you want to complie examples, use the commands below
+
+```
+cmake . -DPSYCHE_BUILD_EXAMPLES=ON
+```
+
+The output files will be in the `build` folder. Header files and lib will be installed into `/usr/local`.
 
 ## Thanks
 

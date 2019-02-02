@@ -12,7 +12,7 @@ psyche 是在 Linux 下利用现代 C++ （C++11 以及更高）开发的异步�
 一个简单的 echo 服务器。
 
 ``` cpp
-#include "psyche/Server.h"
+#include "psyche/psyche.h"
 using namespace psyche;
 
 int main() {
@@ -28,7 +28,7 @@ int main() {
 以及一个用到了一个连接完整生命周期的 echo 服务器。
 
 ``` cpp
-#include "psyche/Server.h"
+#include "psyche/psyche.h"
 using namespace psyche;
 
 int main() {
@@ -68,6 +68,14 @@ cmake .
 make
 sudo make install
 ```
+
+或者可以用下面这条命令同时编译示例
+
+```
+cmake . -DPSYCHE_BUILD_EXAMPLES=ON
+```
+
+生成的文件位于 `build` 文件夹中，头文件和库会被安装至 `/usr/local/` 下。
 
 ## Thanks
 
