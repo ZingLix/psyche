@@ -29,7 +29,6 @@ int main() {
 
 ``` cpp
 #include "psyche/Server.h"
-#include <iostream>
 using namespace psyche;
 
 int main() {
@@ -60,18 +59,19 @@ int main() {
 
 日志库提供了 `LOG_XXX` 形式多级别的，类似于 `std::cout` 的使用方式。
 
-[sample 文件夹](https://github.com/ZingLix/psyche/tree/master/sample)中会有更多示例。
+[example 文件夹](https://github.com/ZingLix/psyche/tree/master/example)中会有更多示例。
 
 ## 安装
 
 ```
 cmake .
 make
+sudo make install
 ```
 
 ## Thanks
 
-本项目受 [muduo](https://github.com/chenshuo/muduo) 启发而来
+本项目受 [muduo](https://github.com/chenshuo/muduo) 和 [asio](https://think-async.com/Asio/) 启发而来
 
 ## License
 

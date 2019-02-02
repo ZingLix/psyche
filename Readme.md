@@ -30,7 +30,6 @@ And an echo server which considers the complete lifetime of the connection.
 
 ``` cpp
 #include "psyche/Server.h"
-#include <iostream>
 using namespace psyche;
 
 int main() {
@@ -61,18 +60,19 @@ All callback funtions will provide a shared pointer `Connection` which points to
 
 Log library provides several levels `LOG_XXX` and `std::cout` like usage. 
 
-You can find more samples in the [sample folder](https://github.com/ZingLix/psyche/tree/master/sample).
+You can find more samples in the [example folder](https://github.com/ZingLix/psyche/tree/master/example).
 
 ## Installation
 
 ```
 cmake .
 make
+sudo make install
 ```
 
 ## Thanks
 
-Inspired by [muduo](https://github.com/chenshuo/muduo)
+Inspired by [muduo](https://github.com/chenshuo/muduo) and [asio](https://think-async.com/Asio/)
 
 ## License
 
