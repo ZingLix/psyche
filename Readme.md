@@ -3,6 +3,8 @@
 
 # psyche
 
+[![Build Status](https://travis-ci.com/ZingLix/psyche.svg?branch=master)](https://travis-ci.com/ZingLix/psyche)
+
 psyche is a modern C++ (C++11 and above) non-blocking network library for Linux and provides serveral components.
 
 - Non-blocking network IO

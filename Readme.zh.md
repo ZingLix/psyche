@@ -2,6 +2,8 @@
 
 # psyche
 
+[![Build Status](https://travis-ci.com/ZingLix/psyche.svg?branch=master)](https://travis-ci.com/ZingLix/psyche)
+
 psyche 是在 Linux 下利用现代 C++ （C++11 以及更高）开发的异步非阻塞式网络库，并提供相关的组件功能
 
 - 非阻塞异步网络 IO 
