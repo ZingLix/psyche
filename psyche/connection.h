@@ -55,6 +55,8 @@ class connection_wrapper
 {
 public:
 	connection_wrapper(connection_ptr c);
+	connection_wrapper(const connection_wrapper& c);
+	connection_wrapper(connection_wrapper&& c) noexcept;
 
 	void send(std::string msg) const;
 

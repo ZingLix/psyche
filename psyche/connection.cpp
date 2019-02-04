@@ -65,6 +65,18 @@ void psyche::connection::handleClose() {
 psyche::connection_wrapper::connection_wrapper(connection_ptr c): conn(c) {
 }
 
+psyche::connection_wrapper::connection_wrapper(const connection_wrapper& c)
+	:conn(c.conn)
+{
+}
+
+psyche::connection_wrapper::connection_wrapper(connection_wrapper&& c) noexcept
+	:conn(std::move(c.conn))
+{
+	
+}
+
+
 void psyche::connection_wrapper::send(std::string msg) const {
 	conn->send(msg, conn->getWriteCallback());
 }
