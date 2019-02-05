@@ -25,9 +25,9 @@ public:
 	void start();
 
 private:
-	void handleRead(connection_ptr con, buffer_impl& buffer) const;
-	void handleWrite(connection_ptr con) const;
-	void HandleClose(connection_ptr con);
+	void handleRead(Connection con, Buffer buffer) const;
+	void handleWrite(Connection con) const;
+	void HandleClose(Connection con);
 
 	context context_;
 	acceptor acceptor_;

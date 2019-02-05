@@ -1,6 +1,7 @@
 #include "connection.h"
 #include "channel.h"
 
+using namespace std::placeholders;
 
 void psyche::connection::send(std::string msg, sendCallback cb) {
 	using namespace std::placeholders;
@@ -14,22 +15,22 @@ psyche::connection::~connection() {
 }
 
 void psyche::connection::setReadCallback(recvCallback cb) {
-	using namespace std::placeholders;
+
 	soc_->read(*read_buffer_, std::bind(&connection::handleRecv, this));
 	recv_callback_ = cb;
 }
 
 void psyche::connection::setWriteCallback(sendCallback cb) {
-	using namespace std::placeholders;
 //	soc_->write(*write_buffer_, std::bind(&connection::handleSend, this));
 	send_callback_ = cb;
 }
 
 void psyche::connection::setCloseCallback(closeCallback cb) {
-	using namespace std::placeholders;
 	soc_->setCloseCallback(std::bind(&connection::handleClose, this));
 	close_callback_ = cb;
 }
+
+psyche::endpoint psyche::connection::peer_endpoint() const { return peer_endpoint_; }
 
 void psyche::connection::handleRecv() {
 	/*if (ec&&ec!=4) {
@@ -41,7 +42,7 @@ void psyche::connection::handleRecv() {
 		handleClose();
 		return;
 	}
-	if (recv_callback_) recv_callback_(shared_from_this(), *read_buffer_);
+	if (recv_callback_) recv_callback_(connection_wrapper(shared_from_this()), buffer_wrapper(*read_buffer_));
 }
 
 void psyche::connection::handleSend() {
@@ -50,11 +51,13 @@ void psyche::connection::handleSend() {
 	//	else throw;
 	//}
 	write_buffer_->writeFd(soc_->fd());
-	if (send_callback_) send_callback_(shared_from_this());
+	if (send_callback_) send_callback_(connection_wrapper(shared_from_this()));
+	if (status_==TOBECLOSED && write_buffer_->curSize() == 0) shutdown();
 }
 
 void psyche::connection::handleClose() {
-	if(close_callback_)	close_callback_(shared_from_this());
+	status_ = CLOSED;
+	if(close_callback_)	close_callback_(connection_wrapper(shared_from_this()));
 	
 	//recv_callback_ = nullptr;
 	//send_callback_ = nullptr;
@@ -81,17 +84,65 @@ void psyche::connection_wrapper::send(std::string msg) const {
 	conn->send(msg, conn->getWriteCallback());
 }
 
-psyche::connection::connection(context& c, int fd): soc_(std::make_unique<socket>(&c, fd)),
-                                                    read_buffer_(std::make_unique<buffer_impl>()),
-                                                    write_buffer_(std::make_unique<buffer_impl>()) {
+psyche::connection_ptr psyche::connection_wrapper::pointer() const {
+	return conn;
 }
 
-psyche::connection::connection(std::unique_ptr<socket>&& soc): soc_(std::move(soc))//,
-                                                             //  read_buffer_(std::make_unique<buffer_impl>()),
-                                                             //  write_buffer_(std::make_unique<buffer_impl>())
+void psyche::connection::shutdown() {
+	soc_->shutdown(SHUT_WR);
+	status_ = CLOSED;
+}
+
+
+psyche::connection::connection(context& c, int fd): soc_(std::make_unique<socket>(&c, fd)),
+                                                    read_buffer_(std::make_unique<buffer_impl>()),
+                                                    write_buffer_(std::make_unique<buffer_impl>()),
+													status_(CONNECTED),
+													local_endpoint_(soc_->local_endpoint()),
+													peer_endpoint_(soc_->peer_endpoint())
 {
-	read_buffer_ = std::make_unique<buffer_impl>();
-	write_buffer_ = std::make_unique<buffer_impl>();
+}
+
+psyche::connection::connection(std::unique_ptr<socket>&& soc): soc_(std::move(soc)),
+                                                               read_buffer_(std::make_unique<buffer_impl>()),
+                                                               write_buffer_(std::make_unique<buffer_impl>()),
+															   status_(CONNECTED),
+	local_endpoint_(soc_->local_endpoint()),
+	peer_endpoint_(soc_->peer_endpoint())
+{
+}
+
+void psyche::connection_wrapper::setReadCallback(recvCallback cb) const {
+	conn->setReadCallback(cb);
+}
+
+void psyche::connection_wrapper::setWriteCallback(sendCallback cb) const {
+	conn->setWriteCallback(cb);
+}
+
+void psyche::connection_wrapper::setCloseCallback(closeCallback cb) const {
+	conn->setCloseCallback(cb);
+}
+
+void psyche::connection::close() {
+	if (write_buffer_->curSize() == 0) {
+		shutdown();
+		status_ = CLOSED;
+	}else {
+		status_ = TOBECLOSED;
+	}
+}
+
+psyche::endpoint psyche::connection::local_endpoint() const {
+	return local_endpoint_;
+}
+
+void psyche::connection_wrapper::close() const {
+	conn->close();
+}
+
+bool psyche::connection_wrapper::operator<(const connection_wrapper& other) const {
+	return conn < other.conn;
 }
 
 psyche::connection::connection(connection&& other) noexcept
@@ -99,6 +150,9 @@ psyche::connection::connection(connection&& other) noexcept
 	read_buffer_(std::move(other.read_buffer_)),
 	write_buffer_(std::move(other.write_buffer_)),
 	recv_callback_(other.recv_callback_),
-	send_callback_(other.send_callback_)
+	send_callback_(other.send_callback_),
+	status_(other.status_),
+	local_endpoint_(other.local_endpoint_),
+	peer_endpoint_(other.peer_endpoint_)
 {
 }

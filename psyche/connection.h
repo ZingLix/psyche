@@ -6,16 +6,27 @@
 
 namespace psyche {
 class connection;
+class connection_wrapper;
 
 using connection_ptr = std::shared_ptr<connection>;
+using Connection = connection_wrapper;
+
+using recvCallback = std::function<void(Connection, Buffer)>;
+using sendCallback = std::function<void(Connection)>;
+using closeCallback = std::function<void(Connection)>;
+using errorCallback = std::function<void(Connection, error_code)>;
 
 class connection:public std::enable_shared_from_this<connection>
 {
 public:
-	using recvCallback = std::function<void(connection_ptr,buffer_impl&)>;
-	using sendCallback = std::function<void(connection_ptr)>;
-	using closeCallback = std::function<void(connection_ptr)>;
-	using errorCallback = std::function<void(connection_ptr,error_code)>;
+	enum status
+	{
+		EMPTY,
+		CONNECTING,
+		CONNECTED,
+		TOBECLOSED,
+		CLOSED
+	};
 
 	connection(context& c, int fd);
 	connection(std::unique_ptr<socket>&& soc);
@@ -34,17 +45,24 @@ public:
 	void setWriteCallback(sendCallback cb);
 	void setCloseCallback(closeCallback cb);
 
-	endpoint local_endpoint()const { return soc_->local_endpoint(); }
-	endpoint peer_endpoint() const { return soc_->peer_endpoint(); }
+	void close();
+
+	endpoint local_endpoint() const;
+	endpoint peer_endpoint() const;
 
 private:
 	void handleRecv();
 	void handleSend();
 	void handleClose();;
 
+	void shutdown();
+
 	std::unique_ptr<socket> soc_;
 	std::unique_ptr<buffer_impl> read_buffer_;
 	std::unique_ptr<buffer_impl> write_buffer_;
+	status status_;
+	endpoint local_endpoint_;
+	endpoint peer_endpoint_;
 	recvCallback recv_callback_;
 	sendCallback send_callback_;
 	closeCallback close_callback_;
@@ -59,13 +77,20 @@ public:
 	connection_wrapper(connection_wrapper&& c) noexcept;
 
 	void send(std::string msg) const;
+	connection_ptr pointer() const;
+
+	void setReadCallback(recvCallback cb) const;
+	void setWriteCallback(sendCallback cb) const;
+	void setCloseCallback(closeCallback cb) const;
+
+	void close() const;
 
 	endpoint local_endpoint()const { return conn->local_endpoint(); }
 	endpoint peer_endpoint() const { return conn->peer_endpoint(); }
 
+	bool operator<(const connection_wrapper& other) const;
+
 private:
 	connection_ptr conn;
 };
-
-using Connection = connection_wrapper;
 }

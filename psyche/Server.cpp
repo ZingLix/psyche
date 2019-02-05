@@ -38,15 +38,15 @@ void psyche::Server::start() {
 	context_.run();
 }
 
-void psyche::Server::handleRead(connection_ptr con, buffer_impl& buffer) const {
-	if (read_callback_) read_callback_(connection_wrapper(con), buffer_wrapper(buffer));
+void psyche::Server::handleRead(Connection con, Buffer buffer) const {
+	if (read_callback_) read_callback_(con, buffer);
 }
 
-void psyche::Server::handleWrite(connection_ptr con) const {
-	if (write_callback_) write_callback_(connection_wrapper(con));
+void psyche::Server::handleWrite(Connection con) const {
+	if (write_callback_) write_callback_(con);
 }
 
-void psyche::Server::HandleClose(connection_ptr con) {
-	if (close_callback_) close_callback_(connection_wrapper(con));
-	connections_.erase(connections_.find(con));
+void psyche::Server::HandleClose(Connection con) {
+	if (close_callback_) close_callback_(con);
+	connections_.erase(connections_.find(con.pointer()));
 }

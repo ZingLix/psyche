@@ -1,5 +1,6 @@
 #include "psyche/Server.h"
 #include <iostream>
+#include <signal.h>
 using namespace psyche;
 
 int main() {
@@ -11,14 +12,14 @@ int main() {
 	s.setReadCallback([](Connection con,Buffer buffer)
 	{
 		auto msg(buffer.retrieveAll());
-		LOG_INFO << "Received from " << con.peer_endpoint().to_string()
-			<< " :" << msg;
+		LOG_INFO << "Received from (" << con.peer_endpoint().to_string()
+			<< "):" << msg;
 		con.send(msg);
+		con.close();
 	});
 	s.setCloseCallback([](Connection con)
 	{
-		LOG_INFO << con.peer_endpoint().address().to_string() << ":"
-			<< con.peer_endpoint().port() << " connection closed";
+		LOG_INFO << con.peer_endpoint().to_string() << " connection closed";
 	});
 	s.start();
 }
