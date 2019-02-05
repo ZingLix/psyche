@@ -9,10 +9,10 @@ const int channel::kWriteEvent = EPOLLOUT;
 
 void channel::handleEvent() {
 	auto t(context_->get_channel(fd()));
-	if (revents_&(EPOLLERR)) {
-		if (errorCallback_) error_cb();
-		return;
-	}
+	//if (revents_&(EPOLLERR)) {
+	//	if (errorCallback_) error_cb();
+	//	return;
+	//}
 	if(revents_&EPOLLRDHUP) {
 		if (closeCallback_) close_cb();
 		return;
