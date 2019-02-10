@@ -46,7 +46,7 @@ matrix:
 
 before_install:
     - eval "${MATRIX_EVAL}"
-script: cmake . -DPSYCHE_BUILD_EXAMPLES=ON && make
+script: cmake . -DPSYCHE_BUILD_ALL_EXAMPLES=ON && make && sudo make install
 
 notifications:
   email: false
