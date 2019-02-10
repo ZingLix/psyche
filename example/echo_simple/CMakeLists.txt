@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 2.6)
 project(psyche-test-echo-simple)
-include_directories(${CMAKE_SOURCE_DIRECTORY})
+include_directories(${CMAKE_SOURCE_DIR})
 cmake_policy(SET CMP0015 NEW)
 add_executable(psyche-test-echo-simple echo_simple.cpp)
 target_link_libraries(psyche-test-echo-simple psyche)
