@@ -5,7 +5,7 @@ int main() {
 	Server s(9981);
 	s.setReadCallback([](Connection con, Buffer buffer)
 		{
-			con.send(buffer.retrieve());
+			con.send(buffer.retrieveAll());
 		});
 	s.start();
 }
