@@ -1,4 +1,4 @@
-#include "psyche/Server.h"
+#include "psyche/psyche.h"
 #include <iostream>
 #include <signal.h>
 using namespace psyche;
