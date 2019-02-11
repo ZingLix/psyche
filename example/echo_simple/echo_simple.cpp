@@ -1,4 +1,4 @@
-#include "psyche/Server.h"
+#include "psyche/psyche.h"
 using namespace psyche;
 
 int main() {
