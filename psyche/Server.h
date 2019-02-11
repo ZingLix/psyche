@@ -2,6 +2,7 @@
 #include <set>
 #include "connection.h"
 #include "acceptor.h"
+#include "ThreadPool.h"
 
 namespace psyche
 {
@@ -23,11 +24,17 @@ public:
 	void setErrorCallback(ErrorCallback cb);
 
 	void start();
+	void erase(connection_ptr con);
+
+	template<typename F,typename ...Args>
+	void execute(F&& f,Args&&... args) {
+		tp_.Execute(std::forward<F>(f), std::forward<Args>(args)...);
+	}
 
 private:
 	void handleRead(Connection con, Buffer buffer) const;
 	void handleWrite(Connection con) const;
-	void HandleClose(Connection con);
+	void handleClose(Connection con);
 
 	context context_;
 	acceptor acceptor_;
@@ -38,5 +45,7 @@ private:
 	WriteCallback write_callback_;
 	CloseCallback close_callback_;
 	ErrorCallback error_callback_;
+
+	ThreadPool tp_;
 };
 }

@@ -7,6 +7,7 @@
 namespace psyche {
 class connection;
 class connection_wrapper;
+class Server;
 
 using connection_ptr = std::shared_ptr<connection>;
 using Connection = connection_wrapper;
@@ -50,10 +51,14 @@ public:
 	endpoint local_endpoint() const;
 	endpoint peer_endpoint() const;
 
-private:
+protected:
+	void invokeReadCallback();
+	void invokeSendCallback();
+	void invokeCloseCallback();
+
 	void handleRecv();
 	void handleSend();
-	void handleClose();;
+	void handleClose();
 
 	void shutdown();
 
@@ -67,6 +72,20 @@ private:
 	sendCallback send_callback_;
 	closeCallback close_callback_;
 	errorCallback error_callback_;
+};
+
+class connection_s:public connection
+{
+public:
+	connection_s(context& c, int fd,Server& s):connection(c,fd),server_(&s){}
+	connection_s(std::unique_ptr<socket>&& soc, Server& s):connection(std::move(soc)),server_(&s){}
+	connection_s(const connection_s&) = delete;
+	connection_s(connection_s&& other) noexcept :connection(std::move(other)),server_(other.server_){}
+protected:
+	void invokeReadCallback();
+	void invokeSendCallback();
+	void invokeCloseCallback();
+	Server* server_;
 };
 
 class connection_wrapper

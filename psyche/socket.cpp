@@ -117,3 +117,12 @@ void socket::handleClose() {
 void socket::setCloseCallback(std::function<void()> cb) {
 	this->cb = cb;
 }
+
+void psyche::socket::enableRead() {
+	context_->get_channel(fd_)->enableReading();
+}
+
+void psyche::socket::disableRead() {
+	context_->get_channel(fd_)->disableReading();
+}
+

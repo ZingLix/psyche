@@ -9,7 +9,7 @@ psyche::Server::Server(std::uint16_t port, const std::string& ip): acceptor_(con
 		using namespace std::placeholders;
 		c->setReadCallback(std::bind(&Server::handleRead, this, _1, _2));
 		c->setWriteCallback(std::bind(&Server::handleWrite, this, _1));
-		c->setCloseCallback(std::bind(&Server::HandleClose, this, _1));
+		c->setCloseCallback(std::bind(&Server::handleClose, this, _1));
 		if (new_conn_callback_) new_conn_callback_(c);
 	});
 }
@@ -46,7 +46,11 @@ void psyche::Server::handleWrite(Connection con) const {
 	if (write_callback_) write_callback_(con);
 }
 
-void psyche::Server::HandleClose(Connection con) {
+void psyche::Server::handleClose(Connection con) {
 	if (close_callback_) close_callback_(con);
 	connections_.erase(connections_.find(con.pointer()));
+}
+
+void psyche::Server::erase(connection_ptr con) {
+	connections_.erase(connections_.find(con));
 }

@@ -1,6 +1,6 @@
 #include "connection.h"
 #include "channel.h"
-
+#include "Server.h"
 using namespace std::placeholders;
 
 void psyche::connection::send(std::string msg, sendCallback cb) {
@@ -32,6 +32,21 @@ void psyche::connection::setCloseCallback(closeCallback cb) {
 
 psyche::endpoint psyche::connection::peer_endpoint() const { return peer_endpoint_; }
 
+void psyche::connection::invokeReadCallback() {
+	if (recv_callback_) 
+		recv_callback_(connection_wrapper(shared_from_this()), buffer_wrapper(*read_buffer_));
+}
+
+void psyche::connection::invokeSendCallback() {
+	if (send_callback_) 
+		send_callback_(connection_wrapper(shared_from_this()));
+}
+
+void psyche::connection::invokeCloseCallback() {
+	if (close_callback_) 
+		close_callback_(connection_wrapper(shared_from_this()));
+}
+
 void psyche::connection::handleRecv() {
 	/*if (ec&&ec!=4) {
 		if (recv_callback_) recv_callback_(ec, nullptr, 0);
@@ -42,7 +57,7 @@ void psyche::connection::handleRecv() {
 		handleClose();
 		return;
 	}
-	if (recv_callback_) recv_callback_(connection_wrapper(shared_from_this()), buffer_wrapper(*read_buffer_));
+	invokeReadCallback();
 }
 
 void psyche::connection::handleSend() {
@@ -51,19 +66,38 @@ void psyche::connection::handleSend() {
 	//	else throw;
 	//}
 	write_buffer_->writeFd(soc_->fd());
-	if (send_callback_) send_callback_(connection_wrapper(shared_from_this()));
+	invokeSendCallback();
 	if (status_==TOBECLOSED && write_buffer_->curSize() == 0) shutdown();
 }
 
 void psyche::connection::handleClose() {
 	status_ = CLOSED;
-	if(close_callback_)	close_callback_(connection_wrapper(shared_from_this()));
-	
-	//recv_callback_ = nullptr;
-	//send_callback_ = nullptr;
-	//close_callback_ = nullptr;
-	//error_callback_ = nullptr;
+	invokeCloseCallback();
 }
+
+void psyche::connection_s::invokeReadCallback() {
+	if (recv_callback_) {
+		server_->execute([=]() {
+			soc_->disableRead();
+			recv_callback_(connection_wrapper(shared_from_this()), buffer_wrapper(*read_buffer_));
+			soc_->enableRead();
+		});
+	}
+}
+
+void psyche::connection_s::invokeSendCallback() {
+	if (send_callback_) {
+		server_->execute(send_callback_, connection_wrapper(shared_from_this()));
+	}
+}
+
+void psyche::connection_s::invokeCloseCallback() {
+	if(close_callback_) {
+		close_callback_(connection_wrapper(shared_from_this()));
+	}
+	server_->erase(shared_from_this());
+}
+
 
 psyche::connection_wrapper::connection_wrapper(connection_ptr c): conn(c) {
 }

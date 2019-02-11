@@ -44,6 +44,9 @@ public:
 
 	void setCloseCallback(std::function<void()>);
 
+	void enableRead();
+	void disableRead();
+
 	void reset();
 private:
 	static inline sockaddr* sockaddr_cast(sockaddr_in& sock_in);
