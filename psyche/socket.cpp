@@ -3,7 +3,6 @@
 #include "channel.h"
 #include <sys/socket.h>
 #include <netinet/in.h>
-#include "LogInfo.h"
 
 using namespace psyche;
 
@@ -26,7 +25,6 @@ socket::socket(context * c)
 //}
 
 psyche::socket::~socket() {
-	LOG_DEBUG << "socket " << fd_ << " destroyed.";
 	if(fd_!=0) {
 		close();
 		context_->remove_channel(fd_);
@@ -110,7 +108,6 @@ void socket::write(buffer_impl& buffer, writeCallback cb) {
 }
 
 void socket::handleClose() {
-	LOG_DEBUG << "socket " << fd_ << " closed.";
 	if (cb) cb();
 }
 

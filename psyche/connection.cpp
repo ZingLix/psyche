@@ -11,7 +11,6 @@ void psyche::connection::send(std::string msg, sendCallback cb) {
 }
 
 psyche::connection::~connection() {
-	LOG_DEBUG << "connection " << soc_->fd() << " start to destroy.";
 }
 
 void psyche::connection::setReadCallback(recvCallback cb) {

@@ -2,7 +2,6 @@
 #include "socket.h"
 #include <utility>
 #include <memory>
-#include "LogInfo.h"
 
 namespace psyche {
 class connection;
