@@ -1,4 +1,4 @@
-[中文](https://github.com/ZingLix/psyche/blob/master/Readme.zh.md)
+[中文](https://github.com/ZingLix/psyche/blob/master/Readme.zh-CN.md)
  | English
 
 # psyche
@@ -7,9 +7,9 @@
 
 psyche is a non-blocking network library for Linux developed with C++17 and provides several components.
 
-- Non-blocking network IO
-- Log
-- Thread Pool
+- [Non-blocking network IO](#Network)
+- [Log](#Log)
+- [Thread Pool](#Thread Pool)
 
 ## Example
 
@@ -17,7 +17,7 @@ To use psyche you need to `#include <psyche/psyche.h>` or the header file for th
 
 ### Network
 
-psyche supports server and ~~client~~(todo) based on TCP.
+psyche supports server and ~~client~~ (todo) based on TCP.
 
 This is a simple echo server.
 
@@ -86,7 +86,7 @@ It provides `LOG_TRACE`, `LOG_DEBUG`, `LOG_INFO`, `LOG_WARN`, `LOG_ERROR` and `L
 
 `#include <psyche/LogInfo.h>` to use thread pool only.
 
-```
+``` cpp
 ThreadPool tp;        //Create a thread pool with default count of threads
 ThreadPool tp(16);    //Create a thread pool with 16 threads
 tp.Execute([](){ LOG_INFO << "Thread started." ;});  //Invoke lambda function
@@ -94,7 +94,7 @@ auto result = tp.Execute(Func, arg1, arg2);          //Invoke functions with arg
 result.get();   //Get the result of one task
 ```
 
-Thread pool constructed with default constructor will create threads which quantity related to the hardware(`std::thread::hardware_concurrency()`). Otherwise, you can specify the number of threads as well.
+Thread pool constructed with default constructor will create threads which quantity related to the hardware (`std::thread::hardware_concurrency()`). Otherwise, you can specify the number of threads as well.
 
 Invoke `Execute()` to add tasks. You can pass lambda expression and arguments as well. You can get the return value and call `get()` to get the return value of your task.
 
@@ -104,7 +104,7 @@ You can find more samples in the [example folder](https://github.com/ZingLix/psy
 
 ## Installation
 
-Compile passed with gcc6 and clang6 and higher edition in Ubuntu 16.04.
+Compile passed with gcc-6 and clang-6 and higher edition in Ubuntu 16.04.
 
 ```
 cmake .

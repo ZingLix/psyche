@@ -6,9 +6,9 @@
 
 psyche 是在 Linux 下利用 C++17 开发的异步非阻塞式网络库，提供如下组件
 
-- 非阻塞异步网络 IO 
-- 日志
-- 线程池
+- [非阻塞异步网络 IO](#网络)
+- [日志](#日志)
+- [线程池](#线程池)
 
 ## 示例
 
@@ -16,7 +16,7 @@ psyche 是在 Linux 下利用 C++17 开发的异步非阻塞式网络库，提�
 
 ### 网络
 
-psyche 支持 TCP 协议的服务器端和~~客户端~~（Todo）。
+psyche 支持 TCP 协议的服务器端和 ~~客户端~~（Todo）。
 
 下面是一个简易的 echo 服务器。
 
@@ -85,7 +85,7 @@ LOG_DEBUG << "Example" << msg;
 
 可以用 `#include <psyche/ThreadPool.h>` 来只使用线程池。
 
-```
+``` cpp
 ThreadPool tp;        //Create a thread pool with default count of threads
 ThreadPool tp(16);    //Create a thread pool with 16 threads
 tp.Execute([](){ LOG_INFO << "Thread started." ;});  //Invoke lambda function
@@ -103,7 +103,7 @@ result.get();   //Get the result of one task
 
 ## 安装
 
-在 Ubuntu 16.04 下的 gcc 6 和 clang 6 及更高版本的编译器上通过编译。
+在 Ubuntu 16.04 下的 gcc-6 和 clang-6 及更高版本的编译器上通过编译。
 
 ```
 cmake .
