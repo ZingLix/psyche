@@ -9,7 +9,7 @@ psyche is a non-blocking network library for Linux developed with C++17 and prov
 
 - [Non-blocking network IO](#Network)
 - [Log](#Log)
-- [Thread Pool](#Thread Pool)
+- [Thread Pool](#Thread-Pool)
 
 ## Example
 
