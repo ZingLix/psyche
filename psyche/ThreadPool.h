@@ -110,7 +110,6 @@ private:
 	}
 
 	std::atomic_bool stop_;
-	std::mutex q_mutex_;
 	thread_safe_queue<Task> task_queue_;
 	std::vector<std::thread> threads_;
 };

@@ -34,7 +34,7 @@ public:
 	connection(connection&& other) noexcept;
 
 	void send(std::string msg, sendCallback cb);
-	~connection();
+	virtual ~connection();
 
 	auto getReadCallback() const { return recv_callback_; }
 	auto getWriteCallback() const { return send_callback_; }
@@ -51,9 +51,9 @@ public:
 	endpoint peer_endpoint() const;
 
 protected:
-	void invokeReadCallback();
-	void invokeSendCallback();
-	void invokeCloseCallback();
+	virtual void invokeReadCallback();
+	virtual void invokeSendCallback();
+	virtual void invokeCloseCallback();
 
 	void handleRecv();
 	void handleSend();
@@ -80,10 +80,14 @@ public:
 	connection_s(std::unique_ptr<socket>&& soc, Server& s):connection(std::move(soc)),server_(&s){}
 	connection_s(const connection_s&) = delete;
 	connection_s(connection_s&& other) noexcept :connection(std::move(other)),server_(other.server_){}
+	connection_s(connection&& other,Server& s) noexcept :connection(std::move(other)), server_(&s) {}
+
+	virtual ~connection_s(){}
+
 protected:
-	void invokeReadCallback();
-	void invokeSendCallback();
-	void invokeCloseCallback();
+	void invokeReadCallback() override;
+	void invokeSendCallback() override;
+	void invokeCloseCallback() override;
 	Server* server_;
 };
 
