@@ -16,6 +16,7 @@ public:
 
 	std::string retrieve(std::size_t num);
 	std::string retrieveAll();
+    std::string retrieveUntil(std::string str);
 
 	void checkIndex();
 	void indexInit();
