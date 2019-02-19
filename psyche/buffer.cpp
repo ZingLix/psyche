@@ -34,6 +34,13 @@ std::string psyche::buffer_impl::retrieveAll() {
 	return tmp;
 }
 
+std::string psyche::buffer_impl::retrieveUntil(std::string str) {
+    std::string tmp(buffer_.begin() + begin_, buffer_.begin() + end_);
+    auto pos = tmp.find(str);
+    if (pos == std::string::npos) return std::string();
+    return retrieve(pos + str.length());
+}
+
 
 void psyche::buffer_impl::checkIndex() {
 	if (begin_ == end_) indexInit();
@@ -103,4 +110,8 @@ std::string psyche::buffer_wrapper::retrieve(std::size_t num) const {
 
 std::string psyche::buffer_wrapper::retrieveAll() const {
 	return buffer_->retrieveAll();
+}
+
+std::string psyche::buffer_wrapper::retrieveUntil(std::string str) const {
+    return buffer_->retrieveUntil(str);
 }
