@@ -46,6 +46,7 @@ public:
 	size_t available() const;
 	std::string retrieve(std::size_t num) const;
 	std::string retrieveAll() const;
+    std::string retrieveUntil(std::string str) const;
 
 private:
 	buffer_impl* buffer_;
