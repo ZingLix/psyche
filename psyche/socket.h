@@ -46,6 +46,7 @@ public:
 
 	void enableRead();
 	void disableRead();
+    void disableWrite();
 
 	void reset();
 private:

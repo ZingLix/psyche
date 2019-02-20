@@ -123,3 +123,6 @@ void psyche::socket::disableRead() {
 	context_->get_channel(fd_)->disableReading();
 }
 
+void psyche::socket::disableWrite() {
+    context_->get_channel(fd_)->disableWriting();
+}

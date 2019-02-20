@@ -64,6 +64,7 @@ void psyche::connection::handleSend() {
     //	else throw;
     //}
     write_buffer_->writeFd(soc_->fd());
+    if (write_buffer_->curSize() == 0) soc_->disableWrite();
     invokeSendCallback();
     if (status_==TOBECLOSED && write_buffer_->curSize() == 0) shutdown();
 }

@@ -89,7 +89,6 @@ void channel::read_cb() {
 void channel::write_cb() {
 	if (fd_ == 0) return;
 	if (writeCallback_) writeCallback_();
-	disableWriting();
 }
 
 void channel::close_cb() {
