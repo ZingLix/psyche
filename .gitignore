@@ -273,6 +273,7 @@ compile_commands.json
 CTestTestfile.cmake
 build/
 CMakeSettings.json
+example/test/
 
 *.sln
 *.vcxproj

@@ -3,6 +3,8 @@
 #include <vector>
 #include <unistd.h>
 #include <string>
+#include <mutex>
+
 namespace psyche
 {
 class buffer_impl
@@ -34,6 +36,7 @@ private:
 	const std::size_t kInitialSize = 1024;
 	const std::size_t kPrependSize = 8;
 
+    std::recursive_mutex mutex_;
 	std::vector<char> buffer_;
 	std::size_t begin_;
 	std::size_t end_;
