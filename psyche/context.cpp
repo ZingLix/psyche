@@ -11,7 +11,7 @@ context::context()
 
 void context::set_revent(int fd, int events) {
 	auto it = channel_map_.find(fd);
-	assert(it != channel_map_.end());
+	if(it != channel_map_.end())
 	it->second->set_revents(events);
 	//channel_map_[fd].set_revents(events);
 }

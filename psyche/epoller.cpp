@@ -1,5 +1,6 @@
 #include "epoller.h"
 #include "channel.h"
+#include <cstring>
 
 using namespace psyche;
 
@@ -16,6 +17,7 @@ epoller::~epoller() {
 
 void epoller::add(int fd) {
 	epoll_event ev;
+    memset(&ev, 0, sizeof ev);
 	ev.data.fd = fd;
 	ev.events = 0;
 	epoll_ctl(epollfd_, EPOLL_CTL_ADD, fd, &ev);

@@ -75,7 +75,6 @@ void psyche::connection::handleSend() {
 void psyche::connection::handleClose() {
     status_ = CLOSED;
     invokeCloseCallback();
-    soc_.release();
 }
 
 void psyche::connection_s::invokeReadCallback() {
