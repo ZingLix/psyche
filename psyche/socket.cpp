@@ -68,7 +68,7 @@ std::unique_ptr<psyche::socket> socket::accept() const {
 	sockaddr_in addr;
 	socklen_t len = sizeof(addr);
 	auto fd = ::accept4(fd_, sockaddr_cast(addr), &len, SOCK_NONBLOCK | SOCK_CLOEXEC);
-    if(fd != -1) {
+    if(fd == -1) {
         throw std::runtime_error(std::to_string(errno));
     }
     return std::make_unique<socket>(context_, fd);
