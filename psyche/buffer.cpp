@@ -21,7 +21,6 @@ const char* psyche::buffer_impl::end() {
 }
 
 std::string psyche::buffer_impl::retrieve(std::size_t num) {
-    std::lock_guard<std::recursive_mutex> guard(mutex_);
 	if (num > curSize()) num = curSize();
 	std::string tmp(buffer_.begin() + begin_, buffer_.begin() + begin_ + num);
 	begin_ += num;
@@ -30,14 +29,12 @@ std::string psyche::buffer_impl::retrieve(std::size_t num) {
 }
 
 std::string psyche::buffer_impl::retrieveAll() {
-    std::lock_guard<std::recursive_mutex> guard(mutex_);
 	std::string tmp(buffer_.begin() + begin_, buffer_.begin() + end_);
 	indexInit();
 	return tmp;
 }
 
 std::string psyche::buffer_impl::retrieveUntil(std::string str) {
-    std::lock_guard<std::recursive_mutex> guard(mutex_);
     std::string tmp(buffer_.begin() + begin_, buffer_.begin() + end_);
     auto pos = tmp.find(str);
     if (pos == std::string::npos) return std::string();
@@ -62,7 +59,6 @@ size_t psyche::buffer_impl::curSize() const {
 }
 
 size_t psyche::buffer_impl::readFd(int fd) {
-    std::lock_guard<std::recursive_mutex> guard(mutex_);
 	char buf[1024];
 	size_t n = read(fd, buf, sizeof buf);
 	if (n != -1 && n != 0) {
@@ -73,7 +69,6 @@ size_t psyche::buffer_impl::readFd(int fd) {
 }
 
 size_t psyche::buffer_impl::writeFd(int fd) {
-    std::lock_guard<std::recursive_mutex> guard(mutex_);
 	size_t n = write(fd, &*buffer_.begin() + begin_, end_ - begin_);
 	begin_ += n;
 	checkIndex();
@@ -81,7 +76,6 @@ size_t psyche::buffer_impl::writeFd(int fd) {
 }
 
 void psyche::buffer_impl::append(const std::string& str) {
-    std::lock_guard<std::recursive_mutex> guard(mutex_);
 	if (freeSize() <= str.length()) {
 		std::copy(buffer_.begin() + begin_, buffer_.begin() + end_, buffer_.begin()+kPrependSize);
 		if (buffer_.capacity() - curSize() -kPrependSize < str.length()) {
@@ -95,7 +89,6 @@ void psyche::buffer_impl::append(const std::string& str) {
 }
 
 void psyche::buffer_impl::prepend(const std::string& str) {
-    std::lock_guard<std::recursive_mutex> guard(mutex_);
 	if (buffer_.capacity() - curSize() < str.length()) {
 		buffer_.reserve(str.length() + buffer_.capacity());
 	}

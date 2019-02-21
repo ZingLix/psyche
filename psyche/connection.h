@@ -62,6 +62,7 @@ protected:
 	void shutdown();
 
 	std::unique_ptr<socket> soc_;
+    std::mutex r_buf_mutex_, w_buf_mutex_;
 	std::unique_ptr<buffer_impl> read_buffer_;
 	std::unique_ptr<buffer_impl> write_buffer_;
 	status status_;

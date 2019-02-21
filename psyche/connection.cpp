@@ -5,8 +5,11 @@ using namespace std::placeholders;
 
 void psyche::connection::send(std::string msg, sendCallback cb) {
     using namespace std::placeholders;
-    send_callback_ = cb;
-    write_buffer_->append(msg);
+    send_callback_ = cb; 
+    {
+        std::lock_guard<std::mutex> guard(w_buf_mutex_);
+        write_buffer_->append(msg); 
+    }
     soc_->write(*write_buffer_, std::bind(&connection::handleSend, this));
 }
 
@@ -46,10 +49,7 @@ void psyche::connection::invokeCloseCallback() {
 }
 
 void psyche::connection::handleRecv() {
-    /*if (ec&&ec!=4) {
-        if (recv_callback_) recv_callback_(ec, nullptr, 0);
-        else throw;
-    }*/
+    std::lock_guard<std::mutex> guard(r_buf_mutex_);
     auto n = read_buffer_->readFd(soc_->fd());
     if(n==0) {
         handleClose();
@@ -63,8 +63,11 @@ void psyche::connection::handleSend() {
     //	if (send_callback_) send_callback_();
     //	else throw;
     //}
+    {
+    std::lock_guard<std::mutex> guard(w_buf_mutex_);
     write_buffer_->writeFd(soc_->fd());
     if (write_buffer_->curSize() == 0) soc_->disableWrite();
+    }
     invokeSendCallback();
     if (status_==TOBECLOSED && write_buffer_->curSize() == 0) shutdown();
 }
