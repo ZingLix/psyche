@@ -49,7 +49,8 @@ void psyche::Server::handleWrite(Connection con) const {
 
 void psyche::Server::handleClose(Connection con) {
 	if (close_callback_) close_callback_(con);
-	connections_.erase(connections_.find(con.pointer()));
+    erase(con.pointer());
+    //connections_.erase(connections_.find(con.pointer()));
 }
 
 void psyche::Server::erase(connection_ptr con) {

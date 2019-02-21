@@ -73,8 +73,11 @@ void psyche::connection::handleSend() {
 }
 
 void psyche::connection::handleClose() {
-    status_ = CLOSED;
-    invokeCloseCallback();
+    if(status_==CONNECTED) {
+
+        status_ = CLOSED;
+        invokeCloseCallback();
+    }
 }
 
 void psyche::connection_s::invokeReadCallback() {
