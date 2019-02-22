@@ -74,30 +74,15 @@ protected:
 	errorCallback error_callback_;
 };
 
-class connection_s:public connection
-{
-public:
-	connection_s(context& c, int fd,Server& s):connection(c,fd),server_(&s){}
-	connection_s(std::unique_ptr<socket>&& soc, Server& s):connection(std::move(soc)),server_(&s){}
-	connection_s(const connection_s&) = delete;
-	connection_s(connection_s&& other) noexcept :connection(std::move(other)),server_(other.server_){}
-	connection_s(connection&& other,Server& s) noexcept :connection(std::move(other)), server_(&s) {}
-
-	virtual ~connection_s(){}
-
-protected:
-	void invokeReadCallback() override;
-	void invokeSendCallback() override;
-	void invokeCloseCallback() override;
-	Server* server_;
-};
-
 class connection_wrapper
 {
 public:
 	connection_wrapper(connection_ptr c);
 	connection_wrapper(const connection_wrapper& c);
 	connection_wrapper(connection_wrapper&& c) noexcept;
+
+    connection_wrapper& operator=(const connection_wrapper& other);
+    connection_wrapper& operator=(connection_wrapper&& other) noexcept;
 
 	void send(std::string msg) const;
 	connection_ptr pointer() const;

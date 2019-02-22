@@ -3,7 +3,7 @@
 psyche::Server::Server(std::uint16_t port, const std::string& ip): acceptor_(context_, endpoint(ip, port)) {
 	acceptor_.accept([&](std::unique_ptr<connection>&& conn)
 	{
-		auto res = connections_.insert(std::make_shared<connection_s>(std::move(*conn),*this));
+		auto res = connections_.insert(std::make_shared<connection>(std::move(*conn)));
 		//auto res= connections_.emplace(std::move(conn)).first;
 		//connections_.emplace(std::move(conn));
 		auto& c = *res.first;
@@ -50,7 +50,7 @@ void psyche::Server::handleWrite(Connection con) const {
 void psyche::Server::handleClose(Connection con) {
 	if (close_callback_) close_callback_(con);
     erase(con.pointer());
-    //connections_.erase(connections_.find(con.pointer()));
+//   connections_.erase(connections_.find(con.pointer()));
 }
 
 void psyche::Server::erase(connection_ptr con) {

@@ -80,30 +80,6 @@ void psyche::connection::handleClose() {
     }
 }
 
-void psyche::connection_s::invokeReadCallback() {
-    if (recv_callback_) {
-        server_->execute([=]() {
-            soc_->disableRead();
-            recv_callback_(connection_wrapper(shared_from_this()), buffer_wrapper(*read_buffer_));
-            soc_->enableRead();
-        });
-    }
-}
-
-void psyche::connection_s::invokeSendCallback() {
-    if (send_callback_) {
-        server_->execute(send_callback_, connection_wrapper(shared_from_this()));
-    }
-}
-
-void psyche::connection_s::invokeCloseCallback() {
-    if(close_callback_) {
-        close_callback_(connection_wrapper(shared_from_this()));
-    }
-    server_->erase(shared_from_this());
-}
-
-
 psyche::connection_wrapper::connection_wrapper(connection_ptr c): conn(c) {
 }
 
@@ -195,4 +171,14 @@ psyche::connection::connection(connection&& other) noexcept
     local_endpoint_(other.local_endpoint_),
     peer_endpoint_(other.peer_endpoint_)
 {
+}
+
+psyche::connection_wrapper& psyche::connection_wrapper::operator=(const connection_wrapper& other) {
+    conn = other.conn;
+    return *this;
+}
+
+psyche::connection_wrapper& psyche::connection_wrapper::operator=(connection_wrapper&& other) noexcept {
+    conn = std::move(other.conn);
+    return *this;
 }
