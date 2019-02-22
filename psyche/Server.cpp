@@ -1,7 +1,10 @@
 #include "Server.h"
+#include <csignal>
 
 psyche::Server::Server(std::uint16_t port, const std::string& ip): acceptor_(context_, endpoint(ip, port)) {
-	acceptor_.accept([&](std::unique_ptr<connection>&& conn)
+    setServer(this);
+    signal(SIGINT, &stopServer);
+    acceptor_.accept([&](std::unique_ptr<connection>&& conn)
 	{
 		auto res = connections_.insert(std::make_shared<connection>(std::move(*conn)));
 		//auto res= connections_.emplace(std::move(conn)).first;
@@ -37,6 +40,10 @@ void psyche::Server::setErrorCallback(ErrorCallback cb) {
 
 void psyche::Server::start() {
 	context_.run();
+}
+
+void psyche::Server::stop() {
+    context_.stop();
 }
 
 void psyche::Server::handleRead(Connection con, Buffer buffer) const {

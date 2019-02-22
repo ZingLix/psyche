@@ -24,6 +24,7 @@ public:
 	void setErrorCallback(ErrorCallback cb);
 
 	void start();
+    void stop();
 	void erase(connection_ptr con);
 
 private:

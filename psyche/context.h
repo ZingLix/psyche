@@ -31,7 +31,7 @@ private:
 
 	bool running_;
 	bool quit_;
-	std::map<int, channelPtr> channel_map_;
+	std::unordered_map<int, channelPtr> channel_map_;
 	std::unique_ptr<epoller> epoller_;
 	std::vector<int> fd_list_;
 };
