@@ -73,8 +73,7 @@ void psyche::connection::handleSend() {
 }
 
 void psyche::connection::handleClose() {
-    if(status_==CONNECTED) {
-
+    if(status_!=CLOSED) {
         status_ = CLOSED;
         invokeCloseCallback();
     }
@@ -104,7 +103,7 @@ psyche::connection_ptr psyche::connection_wrapper::pointer() const {
 
 void psyche::connection::shutdown() {
     soc_->shutdown(SHUT_WR);
-    status_ = CLOSED;
+    status_ = CLOSING;
 }
 
 

@@ -25,6 +25,7 @@ public:
 		CONNECTING,
 		CONNECTED,
 		TOBECLOSED,
+        CLOSING,
 		CLOSED
 	};
 
