@@ -102,6 +102,13 @@ When `ThreadPool` is destroyed, the tasks in the task queue will not be executed
 
 You can find more samples in the [example folder](https://github.com/ZingLix/psyche/tree/master/example).
 
+## Project
+
+Projects based on psyche:
+
+- [psyche-http](https://github.com/ZingLix/psyche-http) ：HTTP Server based on psyche
+- [LixTalk](https://github.com/ZingLix/LixTalk-server) ：Server-side of an IM software
+
 ## Installation
 
 Compile passed with gcc-6 and clang-6 and higher edition in Ubuntu 16.04.

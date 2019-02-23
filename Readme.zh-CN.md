@@ -101,6 +101,13 @@ result.get();   //Get the result of one task
 
 [example 文件夹](https://github.com/ZingLix/psyche/tree/master/example)中会有更多示例。
 
+## 项目
+
+利用 psyche 开发的项目：
+
+- [psyche-http](https://github.com/ZingLix/psyche-http) ：基于 psyche 的 HTTP 服务器
+- [LixTalk](https://github.com/ZingLix/LixTalk-server) ：即时通讯软件服务器端
+
 ## 安装
 
 在 Ubuntu 16.04 下的 gcc-6 和 clang-6 及更高版本的编译器上通过编译。
