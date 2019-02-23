@@ -84,7 +84,7 @@ It provides `LOG_TRACE`, `LOG_DEBUG`, `LOG_INFO`, `LOG_WARN`, `LOG_ERROR` and `L
 
 ### Thread Pool
 
-`#include <psyche/LogInfo.h>` to use thread pool only.
+`#include <psyche/ThreadPool.h>` to use thread pool only.
 
 ``` cpp
 ThreadPool tp;        //Create a thread pool with default count of threads
