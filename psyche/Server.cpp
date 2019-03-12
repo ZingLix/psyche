@@ -2,8 +2,6 @@
 #include <csignal>
 
 psyche::Server::Server(std::uint16_t port, const std::string& ip): acceptor_(context_, endpoint(ip, port)) {
-    setServer(this);
-    signal(SIGINT, &stopServer);
     acceptor_.accept([&](std::unique_ptr<connection>&& conn)
 	{
 		auto res = connections_.insert(std::make_shared<connection>(std::move(*conn)));
@@ -62,6 +60,7 @@ void psyche::Server::handleClose(Connection con) {
 
 void psyche::Server::erase(connection_ptr con) {
     auto it = connections_.find(con);
-    if(it!=connections_.end())
+    if (it != connections_.end())
+    //    cleaner_thread_.add(std::move(con));
 	    connections_.erase(it);
 }
