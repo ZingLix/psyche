@@ -1,5 +1,6 @@
 #include "Server.h"
 #include <csignal>
+#include <cassert>
 
 psyche::Server::Server(std::uint16_t port, const std::string& ip): acceptor_(context_, endpoint(ip, port)) {
     acceptor_.accept([&](std::unique_ptr<connection>&& conn)
@@ -55,12 +56,12 @@ void psyche::Server::handleWrite(Connection con) const {
 void psyche::Server::handleClose(Connection con) {
 	if (close_callback_) close_callback_(con);
     erase(con.pointer());
-//   connections_.erase(connections_.find(con.pointer()));
 }
 
 void psyche::Server::erase(connection_ptr con) {
     auto it = connections_.find(con);
-    if (it != connections_.end())
-    //    cleaner_thread_.add(std::move(con));
-	    connections_.erase(it);
+    auto weak(it);
+    if (it != connections_.end()) {
+        connections_.erase(it);
+    }
 }
