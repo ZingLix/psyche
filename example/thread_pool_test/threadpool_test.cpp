@@ -1,4 +1,4 @@
-#include "psyche/ThreadPool.h"
+#include "psyche/thread_pool.h"
 #include <iostream>
 using namespace psyche;
 

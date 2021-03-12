@@ -1,4 +1,4 @@
-#include "ThreadPool.h"
+#include "thread_pool.h"
 
 psyche::ThreadPool::ThreadPool(size_t thread_nums): stop_(false) {
     for (int i = 0; i < thread_nums; i++) {

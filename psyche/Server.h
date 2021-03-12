@@ -2,7 +2,7 @@
 #include <set>
 #include "connection.h"
 #include "acceptor.h"
-#include "ThreadPool.h"
+#include "thread_pool.h"
 
 namespace psyche
 {

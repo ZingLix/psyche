@@ -1,4 +1,4 @@
-#include "LogInfo.h"
+#include "log.h"
 #include "logging.h"
 #include <type_traits>
 #include <iostream>

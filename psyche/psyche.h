@@ -1,4 +1,4 @@
 #pragma once
-#include "Server.h"
-#include "ThreadPool.h"
-#include "LogInfo.h"
+#include "server.h"
+#include "thread_pool.h"
+#include "log.h"

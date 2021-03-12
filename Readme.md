@@ -71,7 +71,7 @@ Read callback provides `Buffer` as an argument which stores the data received. U
 
 ### Log
 
-`#include <psyche/LogInfo.h>` to use log library only.
+`#include <psyche/log.h>` to use log library only.
 
 Log library provides  `std::cout` like usage. 
 
@@ -84,7 +84,7 @@ It provides `LOG_TRACE`, `LOG_DEBUG`, `LOG_INFO`, `LOG_WARN`, `LOG_ERROR` and `L
 
 ### Thread Pool
 
-`#include <psyche/ThreadPool.h>` to use thread pool only.
+`#include <psyche/thread_pool.h>` to use thread pool only.
 
 ``` cpp
 ThreadPool tp;        //Create a thread pool with default count of threads

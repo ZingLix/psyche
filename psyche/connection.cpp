@@ -1,6 +1,6 @@
 #include "connection.h"
 #include "channel.h"
-#include "Server.h"
+#include "server.h"
 using namespace std::placeholders;
 
 void psyche::connection::send(std::string msg, sendCallback cb) {
