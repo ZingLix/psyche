@@ -1,6 +1,4 @@
 #include "psyche/psyche.h"
-#include <iostream>
-
 using namespace psyche;
 
 int main() {

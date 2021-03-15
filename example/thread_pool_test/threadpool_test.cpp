@@ -19,7 +19,7 @@ void go() {
     tp.execute(test);
     tp.execute(test1, "test2");
     std::string t("test3");
-    tp.execute([=]() {test1(t); });
+    tp.execute([=]() { test1(t); });
     auto res = tp.execute(get);
     std::cout << res.get() << std::endl;
     std::cin.get();
@@ -28,5 +28,4 @@ void go() {
 
 int main() {
     go();
-    
 }

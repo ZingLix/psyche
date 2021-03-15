@@ -26,9 +26,9 @@ using namespace psyche;
 
 int main() {
     Server s(9981);
-    s.setReadCallback([](Connection con, Buffer buffer)
+    s.set_read_callback([](Connection con, Buffer buffer)
     {
-        con.send(buffer.retrieveAll());
+        con.send(buffer.retrieve_all());
     });
     s.start();
 }
@@ -42,21 +42,21 @@ using namespace psyche;
 
 int main() {
     Server s(9981);
-    s.setNewConnCallback([](Connection con)
+    s.set_new_conn_callback([](Connection con)
     {
         LOG_INFO << "New connect from " << con.peer_endpoint().to_string() << ".";
     });
-    s.setReadCallback([](Connection con,Buffer buffer)
+    s.set_read_callback([](Connection con, Buffer buffer)
     {
-        auto msg(buffer.retrieveAll());
-        LOG_INFO << "Received from " << con.peer_endpoint().to_string()
-            << " :" << msg;
+        const auto msg(buffer.retrieve_all());
+        LOG_INFO << "Received from (" << con.peer_endpoint().to_string()
+            << "):" << msg;
         con.send(msg);
+        con.close();
     });
-    s.setCloseCallback([](Connection con)
+    s.set_close_callback([](Connection con)
     {
-        LOG_INFO << con.peer_endpoint().address().to_string() << ":"
-            << con.peer_endpoint().port() << " connection closed";
+        LOG_INFO << con.peer_endpoint().to_string() << " connection closed";
     });
     s.start();
 }
@@ -70,7 +70,7 @@ int main() {
 
 ### 日志
 
-可以用 `#include <psyche/LogInfo.h>` 来只使用日志库。
+可以用 `#include <psyche/log.h>` 来只使用日志库。
 
 日志库提供了类似于 `std::cout` 的使用方式。
 
@@ -83,13 +83,13 @@ LOG_DEBUG << "Example" << msg;
 
 ### 线程池
 
-可以用 `#include <psyche/ThreadPool.h>` 来只使用线程池。
+可以用 `#include <psyche/thread_pool.h>` 来只使用线程池。
 
 ``` cpp
 ThreadPool tp;        //Create a thread pool with default count of threads
 ThreadPool tp(16);    //Create a thread pool with 16 threads
-tp.Execute([](){ LOG_INFO << "Thread started." ;});  //Invoke lambda function
-auto result = tp.Execute(Func, arg1, arg2);          //Invoke functions with arguments
+tp.execute([](){ LOG_INFO << "Thread started." ;});  //Invoke lambda function
+auto result = tp.execute(Func, arg1, arg2);          //Invoke functions with arguments
 result.get();   //Get the result of one task
 ```
 
