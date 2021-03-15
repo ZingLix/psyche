@@ -5,14 +5,12 @@
 using namespace psyche;
 
 Endpoint::Endpoint(const std::string& ip, std::uint16_t port)
-    :address_(ip),port_(port)
-{
+    : address_(ip), port_(port) {
 }
 
-Endpoint::Endpoint(const ::sockaddr_in& sockaddr)
-    :address_(sockaddr.sin_addr.s_addr),
-    port_(ntohs(sockaddr.sin_port))
-{
+Endpoint::Endpoint(const sockaddr_in& sockaddr)
+    : address_(sockaddr.sin_addr.s_addr),
+      port_(ntohs(sockaddr.sin_port)) {
 }
 
 
@@ -35,5 +33,3 @@ sockaddr_in Endpoint::sockaddr() const {
 std::string Endpoint::to_string() const {
     return address().to_string() + ":" + std::to_string(port());
 }
-
-

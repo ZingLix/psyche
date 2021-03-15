@@ -6,7 +6,7 @@ Address::Address(const char* address): addr_() {
     init(address);
 }
 
-Address::Address(const std::string address): addr_() {
+Address::Address(const std::string& address): addr_() {
     init(address.c_str());
 }
 

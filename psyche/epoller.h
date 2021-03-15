@@ -3,8 +3,8 @@
 #include <sys/epoll.h>
 #include <map>
 
-namespace psyche {
-
+namespace psyche
+{
 class Context;
 
 class Epoller
@@ -14,9 +14,9 @@ public:
 
     Epoller(Context* c);
     ~Epoller();
-    void add(int fd);
-    void remove(int fd);
-    void update(int fd, int events);
+    void add(int fd) const;
+    void remove(int fd) const;
+    void update(int fd, int events) const;
     void poll(std::vector<int>& channel_list);
 
 private:

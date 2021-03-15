@@ -18,9 +18,9 @@ public:
 
     ThreadPool(size_t thread_nums = std::thread::hardware_concurrency());
 
-    template<class F,class ...Args>
-    auto execute(F&& f,Args&&... args) {
-        using result_type = std::result_of_t<F(Args...)>;
+    template <class F, class ...Args>
+    auto execute(F&& f, Args&&... args) {
+        using result_type = std::result_of_t<F(Args ...)>;
         auto task = std::make_shared<std::packaged_task<result_type()>>(
             std::bind(std::forward<F>(f), std::forward<Args>(args)...));
         task_queue_.emplace([=]()

@@ -5,8 +5,8 @@
 #include "util.h"
 #include "buffer.h"
 
-namespace psyche {
-
+namespace psyche
+{
 class Channel;
 
 class Context
@@ -24,7 +24,7 @@ public:
     void set_error_callback(int fd, EventCallback cb);
     ChannelPtr get_channel(int fd);
     void stop();
-    
+
     void add_channel(int fd);
     void remove_channel(int fd);
 private:

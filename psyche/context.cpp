@@ -4,15 +4,14 @@
 using namespace psyche;
 
 Context::Context()
-    :running_(false),quit_(false),epoller_(std::make_unique<Epoller>(this))
-{
+    : running_(false), quit_(false), epoller_(std::make_unique<Epoller>(this)) {
 }
 
 
 void Context::set_revent(int fd, int events) {
     auto it = channel_map_.find(fd);
-    if(it != channel_map_.end())
-    it->second->set_revents(events);
+    if (it != channel_map_.end())
+        it->second->set_revents(events);
     //channel_map_[fd].set_revents(events);
 }
 
@@ -26,11 +25,11 @@ void Context::run() {
     while (!quit_) {
         fd_list_.clear();
         epoller_->poll(fd_list_);
-        for(auto fd:fd_list_) {
+        for (auto fd : fd_list_) {
             auto it = channel_map_.find(fd);
-            if(it!=channel_map_.end())
+            if (it != channel_map_.end())
                 it->second->handle_event();
-//			channel_map_[it].handle_event();
+            //			channel_map_[it].handle_event();
         }
     }
     running_ = false;
@@ -44,16 +43,16 @@ void Context::set_read_callback(int fd, EventCallback cb) {
     auto it = channel_map_.find(fd);
     assert(it != channel_map_.end());
     it->second->set_read_callback(cb);
-//	channel_map_.find(fd)->second.set_read_callback(cb, buffer);
-//	channel_map_[fd].set_read_callback(cb, buffer);
+    //	channel_map_.find(fd)->second.set_read_callback(cb, buffer);
+    //	channel_map_[fd].set_read_callback(cb, buffer);
 }
 
 void Context::set_write_callback(int fd, EventCallback cb) {
     auto it = channel_map_.find(fd);
     assert(it != channel_map_.end());
     it->second->set_write_callback(cb);
-//	channel_map_.find(fd)->second.set_write_callback(cb, buffer);
-//	channel_map_[fd].set_write_callback(cb, buffer);
+    //	channel_map_.find(fd)->second.set_write_callback(cb, buffer);
+    //	channel_map_[fd].set_write_callback(cb, buffer);
 }
 
 void Context::set_error_callback(int fd, EventCallback cb) {
@@ -61,7 +60,7 @@ void Context::set_error_callback(int fd, EventCallback cb) {
     assert(it != channel_map_.end());
     it->second->set_error_callback(cb);
     //	channel_map_.find(fd)->second.set_error_callback(cb);
-//	channel_map_[fd].set_error_callback(cb);
+    //	channel_map_[fd].set_error_callback(cb);
 }
 
 Context::ChannelPtr Context::get_channel(int fd) {
@@ -79,4 +78,3 @@ void Context::remove_channel(int fd) {
     epoller_->remove(fd);
     channel_map_.erase(channel_map_.find(fd));
 }
-

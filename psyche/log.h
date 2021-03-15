@@ -10,10 +10,10 @@ public:
     LogInfo(LogLevel level, std::string filename, int line);
 
     template <typename T>
-    LogInfo& operator<<(const T&content);
+    LogInfo& operator<<(const T& content);
 
-    LogInfo& operator<<(const char * content);
-    LogInfo& operator<<(char * content);
+    LogInfo& operator<<(const char* content);
+    LogInfo& operator<<(char* content);
     LogInfo& operator<<(const std::string& content);
     ~LogInfo();
 
@@ -30,12 +30,12 @@ LogInfo& LogInfo::operator<<(const T& content) {
     return *this;
 }
 
-constexpr const char * getfilename(const char * str) {
+constexpr const char* getfilename(const char* str) {
     int idx = 0;
-    for(int i=0;str[i]!='\0';++i) {
+    for (int i = 0; str[i] != '\0'; ++i) {
         if (str[i] == '/') idx = i;
     }
-    return str + idx+1;
+    return str + idx + 1;
 }
 
 
@@ -45,5 +45,3 @@ constexpr const char * getfilename(const char * str) {
 #define LOG_WARN LogInfo(Logger::WARN,getfilename(__FILE__), __LINE__)
 #define LOG_ERROR LogInfo(Logger::ERROR,getfilename(__FILE__), __LINE__)
 #define LOG_FATAL LogInfo(Logger::FATAL,getfilename(__FILE__), __LINE__)
-
-

@@ -7,8 +7,8 @@
 #include "buffer.h"
 #include "util.h"
 
-namespace psyche {
-
+namespace psyche
+{
 class Socket
 {
 public:
@@ -20,33 +20,39 @@ public:
     using WriteCallback = EventCallback;
     using CloseCallback = EventCallback;
 
-    Socket(Context * c);
-    Socket(Context * c,int fd);
+    Socket(Context* c);
+    Socket(Context* c, int fd);
     Socket(const Socket&) = delete;
     Socket(Socket&& soc) noexcept = delete;
     ~Socket();
     void shutdown(int how) const;
     void bind(const Endpoint& ep) const;
     void connect(const Endpoint& ep) const;
-    void listen(int backlog=1000) const;
+    void listen(int backlog = 1000) const;
+    [[nodiscard]]
     std::unique_ptr<Socket> accept() const;
     void close() const;
 
+    [[nodiscard]]
     Endpoint local_endpoint() const;
+    [[nodiscard]]
     Endpoint peer_endpoint() const;
 
-    Context* get_context() { return context_; }
-    int fd() { return fd_; }
+    [[nodiscard]]
+    Context* get_context() const { return context_; }
 
-    void read(BufferImpl& buffer, ReadCallback);
-    void write(BufferImpl& buffer, WriteCallback);
-    void handle_close();
+    [[nodiscard]]
+    int fd() const { return fd_; }
+
+    void read(BufferImpl& buffer, ReadCallback) const;
+    void write(BufferImpl& buffer, WriteCallback) const;
+    void handle_close() const;
 
     void set_close_callback(std::function<void()>);
 
-    void enable_read();
-    void disable_read();
-    void disable_write();
+    void enable_read() const;
+    void disable_read() const;
+    void disable_write() const;
 
     void reset();
 private:
@@ -55,6 +61,6 @@ private:
 
     int fd_;
     Context* context_;
-    std::function<void()> cb;
+    std::function<void()> cb_;
 };
 }

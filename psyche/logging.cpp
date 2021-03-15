@@ -8,18 +8,18 @@ Logger logger;
 Logger::LogLevel log_level(Logger::DEBUG);
 Logger::LogLevel print_level(Logger::DEBUG);
 
-Logger::Logger():thread_(&Logger::loop,this) {
-    std::time_t time = std::time(nullptr);
-    auto res = std::gmtime(&time);
+Logger::Logger(): thread_(&Logger::loop, this) {
+    auto time = std::time(nullptr);
+    auto* const res = std::gmtime(&time);
     char filename[50];
     std::strftime(filename, sizeof(filename), "%Y%m%d%H%M%S.log", res);
-    fd = ::open(filename, O_RDWR | O_APPEND | O_CREAT,0777);
+    fd = open(filename, O_RDWR | O_APPEND | O_CREAT, 0777);
     looping_ = true;
     thread_.detach();
 }
 
 Logger::~Logger() {
-    ::close(fd);
+    close(fd);
 }
 
 void Logger::add_log(Buffer&& buf) {
@@ -38,15 +38,15 @@ void Logger::loop() {
             }
             buf1.swap(buf2);
         }
-        std::string entireLog;
-        for (auto buf : buf2) {
+        std::string entire_log;
+        for (const auto& buf : buf2) {
             /*std::string log;
             for (auto str : buf) {
                 log += str + " ";
             }*/
-            entireLog += buf;
+            entire_log += buf;
         }
         buf2.clear();
-        ::write(fd, entireLog.c_str(), entireLog.length());
+        ::write(fd, entire_log.c_str(), entire_log.length());
     }
 }

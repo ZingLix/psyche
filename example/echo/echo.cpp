@@ -1,6 +1,6 @@
 #include "psyche/psyche.h"
 #include <iostream>
-#include <signal.h>
+
 using namespace psyche;
 
 int main() {
@@ -9,9 +9,9 @@ int main() {
     {
         LOG_INFO << "New connect from " << con.peer_endpoint().to_string() << ".";
     });
-    s.set_read_callback([](Connection con,Buffer buffer)
+    s.set_read_callback([](Connection con, Buffer buffer)
     {
-        auto msg(buffer.retrieve_all());
+        const auto msg(buffer.retrieve_all());
         LOG_INFO << "Received from (" << con.peer_endpoint().to_string()
             << "):" << msg;
         con.send(msg);

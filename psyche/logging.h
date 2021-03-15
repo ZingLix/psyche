@@ -26,7 +26,7 @@ public:
     Logger();
     ~Logger();
 
-    template<typename T>
+    template <typename T>
     void write(const T& content);
 
     void add_log(Buffer&& buf);

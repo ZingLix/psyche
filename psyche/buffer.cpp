@@ -1,9 +1,11 @@
 #include "buffer.h"
 
+#include <unistd.h>
+
 psyche::BufferImpl::BufferImpl()
-:buffer_(k_initial_size_),
-    begin_(k_prepend_size_),
-    end_(k_prepend_size_) {
+    : buffer_(k_initial_size_),
+      begin_(k_prepend_size_),
+      end_(k_prepend_size_) {
 }
 
 psyche::BufferImpl::BufferImpl(BufferImpl&& other) noexcept {
@@ -34,9 +36,9 @@ std::string psyche::BufferImpl::retrieve_all() {
     return tmp;
 }
 
-std::string psyche::BufferImpl::retrieve_until(std::string str) {
-    std::string tmp(buffer_.begin() + begin_, buffer_.begin() + end_);
-    auto pos = tmp.find(str);
+std::string psyche::BufferImpl::retrieve_until(const std::string& str) {
+    const std::string tmp(buffer_.begin() + begin_, buffer_.begin() + end_);
+    const auto pos = tmp.find(str);
     if (pos == std::string::npos) return std::string();
     return retrieve(pos + str.length());
 }
@@ -58,18 +60,18 @@ size_t psyche::BufferImpl::current_size() const {
     return end_ - begin_;
 }
 
-size_t psyche::BufferImpl::read_fd(int fd) {
+size_t psyche::BufferImpl::read_fd(const int fd) {
     char buf[1024];
-    size_t n = read(fd, buf, sizeof buf);
-    if (n != -1 && n != 0) {
+    const size_t n = read(fd, buf, sizeof buf);
+    if (n != static_cast<size_t>(-1) && n != 0) {
         append(std::string(buf, buf + n));
         check_index();
     }
     return n;
 }
 
-size_t psyche::BufferImpl::write_fd(int fd) {
-    size_t n = write(fd, &*buffer_.begin() + begin_, end_ - begin_);
+size_t psyche::BufferImpl::write_fd(const int fd) {
+    const size_t n = write(fd, &*buffer_.begin() + begin_, end_ - begin_);
     begin_ += n;
     check_index();
     return n;
@@ -77,9 +79,9 @@ size_t psyche::BufferImpl::write_fd(int fd) {
 
 void psyche::BufferImpl::append(const std::string& str) {
     if (free_size() <= str.length()) {
-        std::copy(buffer_.begin() + begin_, buffer_.begin() + end_, buffer_.begin()+k_prepend_size_);
-        if (buffer_.capacity() - current_size() -k_prepend_size_ < str.length()) {
-            buffer_.resize(str.length() + end_ -begin_+k_prepend_size_);
+        std::copy(buffer_.begin() + begin_, buffer_.begin() + end_, buffer_.begin() + k_prepend_size_);
+        if (buffer_.capacity() - current_size() - k_prepend_size_ < str.length()) {
+            buffer_.resize(str.length() + end_ - begin_ + k_prepend_size_);
         }
     }
     //LOG_INFO << buffer_.capacity();
@@ -113,6 +115,6 @@ std::string psyche::BufferWrapper::retrieve_all() const {
     return buffer_->retrieve_all();
 }
 
-std::string psyche::BufferWrapper::retrieve_until(std::string str) const {
+std::string psyche::BufferWrapper::retrieve_until(const std::string& str) const {
     return buffer_->retrieve_until(str);
 }

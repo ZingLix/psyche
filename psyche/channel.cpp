@@ -14,14 +14,14 @@ void Channel::handle_event() {
     //	if (errorCallback_) error_cb();
     //	return;
     //}
-    if(revents_&EPOLLRDHUP) {
+    if (revents_ & EPOLLRDHUP) {
         if (closeCallback_) close_cb();
         return;
     }
-    if (revents_&(EPOLLIN | EPOLLPRI)) {
+    if (revents_ & (EPOLLIN | EPOLLPRI)) {
         if (readCallback_) read_cb();
     }
-    if (revents_&EPOLLOUT) {
+    if (revents_ & EPOLLOUT) {
         if (writeCallback_) write_cb();
     }
 }
@@ -38,7 +38,10 @@ void Channel::update() const {
     context_->update_poller(fd_, events());
 }
 
-Channel::Channel(Context* c, int fd): context_(c), fd_(fd), events_(EPOLLERR|EPOLLRDHUP), revents_(0) {
+Channel::Channel(Context* c, int fd)
+    : context_(c),
+      fd_(fd), events_(EPOLLERR | EPOLLRDHUP),
+      revents_(0) {
     update();
 }
 
@@ -78,20 +81,20 @@ void Channel::disable_writing() {
     update();
 }
 
-void Channel::error_cb() {
+void Channel::error_cb() const {
     if (errorCallback_) errorCallback_();
 }
 
-void Channel::read_cb() {
+void Channel::read_cb() const {
     std::size_t n = 0;
     if (readCallback_) readCallback_();
 }
 
-void Channel::write_cb() {
+void Channel::write_cb() const {
     if (fd_ == 0) return;
     if (writeCallback_) writeCallback_();
 }
 
-void Channel::close_cb() {
+void Channel::close_cb() const {
     if (closeCallback_) closeCallback_();
 }

@@ -1,9 +1,10 @@
 #pragma once
 #include "socket.h"
-#include <utility>
 #include <memory>
+#include <mutex>
 
-namespace psyche {
+namespace psyche
+{
 class ConnectionImpl;
 class ConnectionWrapper;
 class Server;
@@ -16,7 +17,7 @@ using SendCallback = std::function<void(Connection)>;
 using CloseCallback = std::function<void(Connection)>;
 using ErrorCallback = std::function<void(Connection, ErrorCode)>;
 
-class ConnectionImpl:public std::enable_shared_from_this<ConnectionImpl>
+class ConnectionImpl : public std::enable_shared_from_this<ConnectionImpl>
 {
 public:
     enum Status
@@ -34,7 +35,7 @@ public:
     ConnectionImpl(const ConnectionImpl&) = delete;
     ConnectionImpl(ConnectionImpl&& other) noexcept;
 
-    void send(std::string msg, SendCallback cb);
+    void send(const std::string& msg, SendCallback cb);
     virtual ~ConnectionImpl();
 
     auto get_read_callback() const { return recv_callback_; }
@@ -79,22 +80,25 @@ class ConnectionWrapper
 {
 public:
     ConnectionWrapper(ConnectionPtr c);
-    ConnectionWrapper(const ConnectionWrapper& c);
+    ConnectionWrapper(const ConnectionWrapper& c) = default;
     ConnectionWrapper(ConnectionWrapper&& c) noexcept;
 
     ConnectionWrapper& operator=(const ConnectionWrapper& other);
     ConnectionWrapper& operator=(ConnectionWrapper&& other) noexcept;
 
-    void send(std::string msg) const;
+    void send(const std::string& msg) const;
     ConnectionPtr pointer() const;
 
-    void setReadCallback(RecvCallback cb) const;
-    void setWriteCallback(SendCallback cb) const;
-    void setCloseCallback(CloseCallback cb) const;
+    void set_read_callback(RecvCallback cb) const;
+    void set_write_callback(SendCallback cb) const;
+    void set_close_callback(CloseCallback cb) const;
 
     void close() const;
 
-    Endpoint local_endpoint()const { return conn->local_endpoint(); }
+    [[nodiscard]]
+    Endpoint local_endpoint() const { return conn->local_endpoint(); }
+
+    [[nodiscard]]
     Endpoint peer_endpoint() const { return conn->peer_endpoint(); }
 
     bool operator<(const ConnectionWrapper& other) const;

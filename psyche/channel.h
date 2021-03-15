@@ -2,11 +2,11 @@
 #include <functional>
 
 #include "context.h"
-#include "socket.h"
 #include "util.h"
 
-namespace psyche {
-class Channel:std::enable_shared_from_this<Channel>
+namespace psyche
+{
+class Channel : std::enable_shared_from_this<Channel>
 {
 public:
 
@@ -22,10 +22,10 @@ public:
     void enable_writing();
     void disable_writing();
 
-    void error_cb();
-    void read_cb();
-    void write_cb();
-    void close_cb();
+    void error_cb() const;
+    void read_cb() const;
+    void write_cb() const;
+    void close_cb() const;
     void handle_event();
 
     void set_revents(int revent);

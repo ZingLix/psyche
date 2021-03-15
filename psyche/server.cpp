@@ -1,6 +1,4 @@
 #include "server.h"
-#include <csignal>
-#include <cassert>
 
 psyche::Server::Server(std::uint16_t port, const std::string& ip): acceptor_(context_, Endpoint(ip, port)) {
     acceptor_.accept([&](std::unique_ptr<ConnectionImpl>&& conn)
@@ -18,23 +16,23 @@ psyche::Server::Server(std::uint16_t port, const std::string& ip): acceptor_(con
 }
 
 void psyche::Server::set_new_conn_callback(NewConnCallback cb) {
-    new_conn_callback_ = cb;
+    new_conn_callback_ = std::move(cb);
 }
 
 void psyche::Server::set_read_callback(ReadCallback cb) {
-    read_callback_ = cb;
+    read_callback_ = std::move(cb);
 }
 
 void psyche::Server::set_write_callback(WriteCallback cb) {
-    write_callback_ = cb;
+    write_callback_ = std::move(cb);
 }
 
 void psyche::Server::set_close_callback(CloseCallback cb) {
-    close_callback_ = cb;
+    close_callback_ = std::move(cb);
 }
 
 void psyche::Server::set_error_callback(ErrorCallback cb) {
-    error_callback_ = cb;
+    error_callback_ = std::move(cb);
 }
 
 void psyche::Server::start() {
@@ -50,7 +48,7 @@ void psyche::Server::handle_read(Connection con, Buffer buffer) const {
 }
 
 void psyche::Server::handle_write(Connection con) const {
-    if (write_callback_) write_callback_(con);
+    if (write_callback_) write_callback_(std::move(con));
 }
 
 void psyche::Server::handle_close(Connection con) {
@@ -59,8 +57,7 @@ void psyche::Server::handle_close(Connection con) {
 }
 
 void psyche::Server::erase(ConnectionPtr con) {
-    auto it = connections_.find(con);
-    auto weak(it);
+    const auto it = connections_.find(con);
     if (it != connections_.end()) {
         connections_.erase(it);
     }

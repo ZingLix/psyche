@@ -17,8 +17,7 @@ void psyche::ThreadPool::stop_force() {
 }
 
 void psyche::ThreadPool::stop() {
-    while (!task_queue_.empty())
-        ;
+    while (!task_queue_.empty());
     stop_force();
 }
 

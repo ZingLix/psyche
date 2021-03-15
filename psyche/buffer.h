@@ -1,9 +1,6 @@
 #pragma once
-#include <ctime>
 #include <vector>
-#include <unistd.h>
 #include <string>
-#include <mutex>
 
 namespace psyche
 {
@@ -18,12 +15,14 @@ public:
 
     std::string retrieve(std::size_t num);
     std::string retrieve_all();
-    std::string retrieve_until(std::string str);
+    std::string retrieve_until(const std::string& str);
 
     void check_index();
     void index_init();
 
+    [[nodiscard]]
     size_t free_size() const;
+    [[nodiscard]]
     size_t current_size() const;
 
     size_t read_fd(int fd);
@@ -44,17 +43,21 @@ private:
 class BufferWrapper
 {
 public:
-    BufferWrapper(BufferImpl& b):buffer_(&b){}
+    BufferWrapper(BufferImpl& b): buffer_(&b) {
+    }
 
+    [[nodiscard]]
     size_t available() const;
+    [[nodiscard]]
     std::string retrieve(std::size_t num) const;
+    [[nodiscard]]
     std::string retrieve_all() const;
-    std::string retrieve_until(std::string str) const;
+    [[nodiscard]]
+    std::string retrieve_until(const std::string& str) const;
 
 private:
     BufferImpl* buffer_;
 };
 
 using Buffer = BufferWrapper;
-
 }
