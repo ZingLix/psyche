@@ -3,144 +3,144 @@
 #include "server.h"
 using namespace std::placeholders;
 
-void psyche::connection::send(std::string msg, sendCallback cb) {
+void psyche::ConnectionImpl::send(std::string msg, SendCallback cb) {
     using namespace std::placeholders;
     send_callback_ = cb; 
     {
         std::lock_guard<std::mutex> guard(w_buf_mutex_);
         write_buffer_->append(msg); 
     }
-    soc_->write(*write_buffer_, std::bind(&connection::handleSend, this));
+    soc_->write(*write_buffer_, std::bind(&ConnectionImpl::handle_send, this));
 }
 
-psyche::connection::~connection() {
+psyche::ConnectionImpl::~ConnectionImpl() {
 }
 
-void psyche::connection::setReadCallback(recvCallback cb) {
-    soc_->read(*read_buffer_, std::bind(&connection::handleRecv, this));
+void psyche::ConnectionImpl::set_read_callback(RecvCallback cb) {
+    soc_->read(*read_buffer_, std::bind(&ConnectionImpl::handle_recv, this));
     recv_callback_ = cb;
 }
 
-void psyche::connection::setWriteCallback(sendCallback cb) {
-//	soc_->write(*write_buffer_, std::bind(&connection::handleSend, this));
+void psyche::ConnectionImpl::set_write_callback(SendCallback cb) {
+//	soc_->write(*write_buffer_, std::bind(&ConnectionImpl::handle_send, this));
     send_callback_ = cb;
 }
 
-void psyche::connection::setCloseCallback(closeCallback cb) {
-    soc_->setCloseCallback(std::bind(&connection::handleClose, this));
+void psyche::ConnectionImpl::set_close_callback(CloseCallback cb) {
+    soc_->set_close_callback(std::bind(&ConnectionImpl::handle_close, this));
     close_callback_ = cb;
 }
 
-psyche::endpoint psyche::connection::peer_endpoint() const { return peer_endpoint_; }
+psyche::endpoint psyche::ConnectionImpl::peer_endpoint() const { return peer_endpoint_; }
 
-void psyche::connection::invokeReadCallback() {
+void psyche::ConnectionImpl::invoke_read_callback() {
     if (recv_callback_) 
-        recv_callback_(connection_wrapper(shared_from_this()), buffer_wrapper(*read_buffer_));
+        recv_callback_(ConnectionWrapper(shared_from_this()), BufferWrapper(*read_buffer_));
 }
 
-void psyche::connection::invokeSendCallback() {
+void psyche::ConnectionImpl::invoke_send_callback() {
     if (send_callback_) 
-        send_callback_(connection_wrapper(shared_from_this()));
+        send_callback_(ConnectionWrapper(shared_from_this()));
 }
 
-void psyche::connection::invokeCloseCallback() {
+void psyche::ConnectionImpl::invoke_close_callback() {
     if (close_callback_) 
-        close_callback_(connection_wrapper(shared_from_this()));
+        close_callback_(ConnectionWrapper(shared_from_this()));
 }
 
-void psyche::connection::handleRecv() {
+void psyche::ConnectionImpl::handle_recv() {
     std::lock_guard<std::mutex> guard(r_buf_mutex_);
-    auto n = read_buffer_->readFd(soc_->fd());
+    auto n = read_buffer_->read_fd(soc_->fd());
     if(n==0) {
-        handleClose();
+        handle_close();
         return;
     }
-    invokeReadCallback();
+    invoke_read_callback();
 }
 
-void psyche::connection::handleSend() {
+void psyche::ConnectionImpl::handle_send() {
     //if(ec&&ec != 4) {
     //	if (send_callback_) send_callback_();
     //	else throw;
     //}
     {
     std::lock_guard<std::mutex> guard(w_buf_mutex_);
-    write_buffer_->writeFd(soc_->fd());
-    if (write_buffer_->curSize() == 0) soc_->disableWrite();
+    write_buffer_->write_fd(soc_->fd());
+    if (write_buffer_->current_size() == 0) soc_->disable_write();
     }
-    invokeSendCallback();
-    if (status_==TOBECLOSED && write_buffer_->curSize() == 0) shutdown();
+    invoke_send_callback();
+    if (status_==TOBECLOSED && write_buffer_->current_size() == 0) shutdown();
 }
 
-void psyche::connection::handleClose() {
+void psyche::ConnectionImpl::handle_close() {
     if(status_!=CLOSED) {
         status_ = CLOSED;
-        invokeCloseCallback();
+        invoke_close_callback();
     }
 }
 
-psyche::connection_wrapper::connection_wrapper(connection_ptr c): conn(c) {
+psyche::ConnectionWrapper::ConnectionWrapper(ConnectionPtr c): conn(c) {
 }
 
-psyche::connection_wrapper::connection_wrapper(const connection_wrapper& c)
+psyche::ConnectionWrapper::ConnectionWrapper(const ConnectionWrapper& c)
     :conn(c.conn)
 {
 }
 
-psyche::connection_wrapper::connection_wrapper(connection_wrapper&& c) noexcept
+psyche::ConnectionWrapper::ConnectionWrapper(ConnectionWrapper&& c) noexcept
     :conn(std::move(c.conn))
 {
 }
 
 
-void psyche::connection_wrapper::send(std::string msg) const {
-    conn->send(msg, conn->getWriteCallback());
+void psyche::ConnectionWrapper::send(std::string msg) const {
+    conn->send(msg, conn->get_write_callback());
 }
 
-psyche::connection_ptr psyche::connection_wrapper::pointer() const {
+psyche::ConnectionPtr psyche::ConnectionWrapper::pointer() const {
     return conn;
 }
 
-void psyche::connection::shutdown() {
+void psyche::ConnectionImpl::shutdown() {
     soc_->shutdown(SHUT_WR);
     status_ = CLOSING;
 }
 
 
-psyche::connection::connection(context& c, int fd)
+psyche::ConnectionImpl::ConnectionImpl(context& c, int fd)
     : soc_(std::make_unique<socket>(&c, fd)),
-    read_buffer_(std::make_unique<buffer_impl>()),
-    write_buffer_(std::make_unique<buffer_impl>()),
+    read_buffer_(std::make_unique<BufferImpl>()),
+    write_buffer_(std::make_unique<BufferImpl>()),
     status_(CONNECTED),
     local_endpoint_(soc_->local_endpoint()),
     peer_endpoint_(soc_->peer_endpoint())
 {
 }
 
-psyche::connection::connection(std::unique_ptr<socket>&& soc)
+psyche::ConnectionImpl::ConnectionImpl(std::unique_ptr<socket>&& soc)
     : soc_(std::move(soc)),
-    read_buffer_(std::make_unique<buffer_impl>()),
-    write_buffer_(std::make_unique<buffer_impl>()),
+    read_buffer_(std::make_unique<BufferImpl>()),
+    write_buffer_(std::make_unique<BufferImpl>()),
     status_(CONNECTED),
     local_endpoint_(soc_->local_endpoint()),
     peer_endpoint_(soc_->peer_endpoint())
 {
 }
 
-void psyche::connection_wrapper::setReadCallback(recvCallback cb) const {
-    conn->setReadCallback(cb);
+void psyche::ConnectionWrapper::setReadCallback(RecvCallback cb) const {
+    conn->set_read_callback(cb);
 }
 
-void psyche::connection_wrapper::setWriteCallback(sendCallback cb) const {
-    conn->setWriteCallback(cb);
+void psyche::ConnectionWrapper::setWriteCallback(SendCallback cb) const {
+    conn->set_write_callback(cb);
 }
 
-void psyche::connection_wrapper::setCloseCallback(closeCallback cb) const {
-    conn->setCloseCallback(cb);
+void psyche::ConnectionWrapper::setCloseCallback(CloseCallback cb) const {
+    conn->set_close_callback(cb);
 }
 
-void psyche::connection::close() {
-    if (write_buffer_->curSize() == 0) {
+void psyche::ConnectionImpl::close() {
+    if (write_buffer_->current_size() == 0) {
         shutdown();
         status_ = CLOSED;
     }else {
@@ -148,19 +148,19 @@ void psyche::connection::close() {
     }
 }
 
-psyche::endpoint psyche::connection::local_endpoint() const {
+psyche::endpoint psyche::ConnectionImpl::local_endpoint() const {
     return local_endpoint_;
 }
 
-void psyche::connection_wrapper::close() const {
+void psyche::ConnectionWrapper::close() const {
     conn->close();
 }
 
-bool psyche::connection_wrapper::operator<(const connection_wrapper& other) const {
+bool psyche::ConnectionWrapper::operator<(const ConnectionWrapper& other) const {
     return conn < other.conn;
 }
 
-psyche::connection::connection(connection&& other) noexcept
+psyche::ConnectionImpl::ConnectionImpl(ConnectionImpl&& other) noexcept
     :soc_(std::move(other.soc_)),
     read_buffer_(std::move(other.read_buffer_)),
     write_buffer_(std::move(other.write_buffer_)),
@@ -172,12 +172,12 @@ psyche::connection::connection(connection&& other) noexcept
 {
 }
 
-psyche::connection_wrapper& psyche::connection_wrapper::operator=(const connection_wrapper& other) {
+psyche::ConnectionWrapper& psyche::ConnectionWrapper::operator=(const ConnectionWrapper& other) {
     conn = other.conn;
     return *this;
 }
 
-psyche::connection_wrapper& psyche::connection_wrapper::operator=(connection_wrapper&& other) noexcept {
+psyche::ConnectionWrapper& psyche::ConnectionWrapper::operator=(ConnectionWrapper&& other) noexcept {
     conn = std::move(other.conn);
     return *this;
 }

@@ -12,27 +12,27 @@ class channel;
 class context
 {
 public:
-	using channelPtr = std::shared_ptr<channel>;
+    using channelPtr = std::shared_ptr<channel>;
 
-	context();
+    context();
 
-	void run();
-	void set_revent(int fd, int events);
-	void update_poller(int fd, int events) const;
-	void set_read_callback(int fd, EventCallback cb);
-	void set_write_callback(int fd, EventCallback cb);
-	void set_error_callback(int fd, EventCallback cb);
-	channelPtr get_channel(int fd);
-	void stop();
-	
-	void add_channel(int fd);
-	void remove_channel(int fd);
+    void run();
+    void set_revent(int fd, int events);
+    void update_poller(int fd, int events) const;
+    void set_read_callback(int fd, EventCallback cb);
+    void set_write_callback(int fd, EventCallback cb);
+    void set_error_callback(int fd, EventCallback cb);
+    channelPtr get_channel(int fd);
+    void stop();
+    
+    void add_channel(int fd);
+    void remove_channel(int fd);
 private:
 
-	bool running_;
-	bool quit_;
-	std::unordered_map<int, channelPtr> channel_map_;
-	std::unique_ptr<epoller> epoller_;
-	std::vector<int> fd_list_;
+    bool running_;
+    bool quit_;
+    std::unordered_map<int, channelPtr> channel_map_;
+    std::unique_ptr<epoller> epoller_;
+    std::vector<int> fd_list_;
 };
 }

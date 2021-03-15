@@ -5,37 +5,37 @@
 class LogInfo
 {
 public:
-	using LogLevel = Logger::LogLevel;
+    using LogLevel = Logger::LogLevel;
 
-	LogInfo(LogLevel level, std::string filename, int line);
+    LogInfo(LogLevel level, std::string filename, int line);
 
-	template <typename T>
-	LogInfo& operator<<(const T&content);
+    template <typename T>
+    LogInfo& operator<<(const T&content);
 
-	LogInfo& operator<<(const char * content);
-	LogInfo& operator<<(char * content);
-	LogInfo& operator<<(const std::string& content);
-	~LogInfo();
+    LogInfo& operator<<(const char * content);
+    LogInfo& operator<<(char * content);
+    LogInfo& operator<<(const std::string& content);
+    ~LogInfo();
 
 private:
-	std::string buf;
-	LogLevel logLevel_;
-	std::string sourcefile;
-	int line_;
+    std::string buf;
+    LogLevel logLevel_;
+    std::string sourcefile;
+    int line_;
 };
 
 template <typename T>
 LogInfo& LogInfo::operator<<(const T& content) {
-	this->operator<<(std::to_string(content));
-	return *this;
+    this->operator<<(std::to_string(content));
+    return *this;
 }
 
 constexpr const char * getfilename(const char * str) {
-	int idx = 0;
-	for(int i=0;str[i]!='\0';++i) {
-		if (str[i] == '/') idx = i;
-	}
-	return str + idx+1;
+    int idx = 0;
+    for(int i=0;str[i]!='\0';++i) {
+        if (str[i] == '/') idx = i;
+    }
+    return str + idx+1;
 }
 
 

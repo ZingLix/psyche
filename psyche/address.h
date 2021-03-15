@@ -8,20 +8,20 @@ namespace ip
 
 using port = std::uint16_t;
 
-class address
+class Address
 {
 public:
-	address(const char* addr);
-	address(const std::string addr);
-	address(uint32_t addr) :addr_(addr) {}
+    Address(const char* address);
+    Address(const std::string address);
+    Address(const uint32_t address) :addr_(address) {}
 
-	std::string to_string() const;
-	in_addr_t raw() const;
+    std::string to_string() const;
+    in_addr_t raw() const;
 
 private:
-	void init(const char* addr);
+    void init(const char* addr);
 
-	in_addr_t addr_;
+    in_addr_t addr_;
 };
 
 

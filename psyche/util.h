@@ -3,6 +3,6 @@
 
 namespace psyche
 {
-using error_code = int;
+using ErrorCode = int;
 using EventCallback = std::function<void()>;
 }

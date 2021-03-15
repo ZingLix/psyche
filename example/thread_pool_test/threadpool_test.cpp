@@ -3,11 +3,11 @@
 using namespace psyche;
 
 void test() {
-	std::cout << "asdf" << std::endl;
+    std::cout << "asdf" << std::endl;
 }
 
 void test1(std::string example) {
-	std::cout << example << std::endl;
+    std::cout << example << std::endl;
 }
 
 int get() {
@@ -15,18 +15,18 @@ int get() {
 }
 
 void go() {
-	ThreadPool tp;
-	tp.Execute(test);
-	tp.Execute(test1, "test2");
-	std::string t("test3");
-	tp.Execute([=]() {test1(t); });
-    auto res = tp.Execute(get);
+    ThreadPool tp;
+    tp.execute(test);
+    tp.execute(test1, "test2");
+    std::string t("test3");
+    tp.execute([=]() {test1(t); });
+    auto res = tp.execute(get);
     std::cout << res.get() << std::endl;
     std::cin.get();
-	tp.stop();
+    tp.stop();
 }
 
 int main() {
-	go();
+    go();
     
 }

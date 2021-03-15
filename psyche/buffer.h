@@ -7,54 +7,54 @@
 
 namespace psyche
 {
-class buffer_impl
+class BufferImpl
 {
 public:
-	buffer_impl();
-	buffer_impl(buffer_impl&& other) noexcept;
+    BufferImpl();
+    BufferImpl(BufferImpl&& other) noexcept;
 
-	const char* start();
-	const char* end();
+    const char* start();
+    const char* end();
 
-	std::string retrieve(std::size_t num);
-	std::string retrieveAll();
-    std::string retrieveUntil(std::string str);
+    std::string retrieve(std::size_t num);
+    std::string retrieve_all();
+    std::string retrieve_until(std::string str);
 
-	void checkIndex();
-	void indexInit();
+    void check_index();
+    void index_init();
 
-	size_t freeSize() const;
-	size_t curSize() const;
+    size_t free_size() const;
+    size_t current_size() const;
 
-	size_t readFd(int fd);
-	size_t writeFd(int fd);
+    size_t read_fd(int fd);
+    size_t write_fd(int fd);
 
-	void append(const std::string& str);
-	void prepend(const std::string& str);
+    void append(const std::string& str);
+    void prepend(const std::string& str);
 
 private:
-	const std::size_t kInitialSize = 1024;
-	const std::size_t kPrependSize = 8;
+    const std::size_t k_initial_size_ = 1024;
+    const std::size_t k_prepend_size_ = 8;
 
-	std::vector<char> buffer_;
-	std::size_t begin_;
-	std::size_t end_;
+    std::vector<char> buffer_;
+    std::size_t begin_;
+    std::size_t end_;
 };
 
-class buffer_wrapper
+class BufferWrapper
 {
 public:
-	buffer_wrapper(buffer_impl& b):buffer_(&b){}
+    BufferWrapper(BufferImpl& b):buffer_(&b){}
 
-	size_t available() const;
-	std::string retrieve(std::size_t num) const;
-	std::string retrieveAll() const;
-    std::string retrieveUntil(std::string str) const;
+    size_t available() const;
+    std::string retrieve(std::size_t num) const;
+    std::string retrieve_all() const;
+    std::string retrieve_until(std::string str) const;
 
 private:
-	buffer_impl* buffer_;
+    BufferImpl* buffer_;
 };
 
-using Buffer = buffer_wrapper;
+using Buffer = BufferWrapper;
 
 }

@@ -10,44 +10,44 @@ class channel:std::enable_shared_from_this<channel>
 {
 public:
 
-	channel(context* c, int fd);
+    channel(context* c, int fd);
 
-	void setReadCallback(const EventCallback& cb);
-	void setWriteCallback(const EventCallback& cb);
-	void setCloseCallback(const EventCallback& cb);
-	void setErrorCallback(const EventCallback& cb);
+    void set_read_callback(const EventCallback& cb);
+    void set_write_callback(const EventCallback& cb);
+    void set_close_callback(const EventCallback& cb);
+    void set_error_callback(const EventCallback& cb);
 
-	void enableReading();
-	void disableReading();
-	void enableWriting();
-	void disableWriting();
+    void enable_reading();
+    void disable_reading();
+    void enable_writing();
+    void disable_writing();
 
-	void error_cb();
-	void read_cb();
-	void write_cb();
-	void close_cb();
-	void handleEvent();
+    void error_cb();
+    void read_cb();
+    void write_cb();
+    void close_cb();
+    void handle_event();
 
-	void set_revents(int revent);
-	int events() const;
-	int fd() const;
-	bool isNoneEvent() const;
+    void set_revents(int revent);
+    int events() const;
+    int fd() const;
+    bool is_none_event() const;
 
 private:
-	void update() const;
+    void update() const;
 
-	static const int kNoneEvent;
-	static const int kReadEvent;
-	static const int kWriteEvent;
+    static const int kNoneEvent;
+    static const int kReadEvent;
+    static const int kWriteEvent;
 
-	context* context_;
-	const int fd_;
-	int events_;
-	int revents_;
+    context* context_;
+    const int fd_;
+    int events_;
+    int revents_;
 
-	EventCallback readCallback_;
-	EventCallback writeCallback_;
-	EventCallback closeCallback_;
-	EventCallback errorCallback_;
+    EventCallback readCallback_;
+    EventCallback writeCallback_;
+    EventCallback closeCallback_;
+    EventCallback errorCallback_;
 };
 }

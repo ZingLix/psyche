@@ -6,34 +6,34 @@
 #include <memory>
 
 namespace psyche {
-class acceptor
+class Acceptor
 {
 public:
-	using acceptCallback = std::function<void(std::unique_ptr<connection>&&)>;
+    using AcceptCallback = std::function<void(std::unique_ptr<ConnectionImpl>&&)>;
 
-	acceptor(context& context, endpoint ep):soc_(&context) {
-		soc_.bind(ep);
-	}
+    Acceptor(context& context,const endpoint ep):soc_(&context) {
+        soc_.bind(ep);
+    }
 
-	void accept(acceptCallback cb,int backlog=1000) {
-		soc_.listen(backlog);
-		using namespace std::placeholders;
-		soc_.get_context()->set_read_callback(soc_.fd(),
-		                                      std::bind(&acceptor::handleNewConn,this));
-		accept_cb_ = cb;
-		soc_.get_context()->get_channel(soc_.fd())->enableReading();
-	}
+    void accept(const AcceptCallback cb,const int backlog=1000) {
+        soc_.listen(backlog);
+        using namespace std::placeholders;
+        soc_.get_context()->set_read_callback(soc_.fd(),
+                                              std::bind(&Acceptor::handle_new_connection,this));
+        accept_cb_ = cb;
+        soc_.get_context()->get_channel(soc_.fd())->enable_reading();
+    }
 
 private:
-	void handleNewConn() {
-		//if (ec) throw;
-		auto new_soc= soc_.accept();
-		if(accept_cb_) {
-			accept_cb_(std::make_unique<connection>(std::move(new_soc)));
-		}
-	}
+    void handle_new_connection() const {
+        //if (ec) throw;
+        auto new_soc= soc_.accept();
+        if(accept_cb_) {
+            accept_cb_(std::make_unique<ConnectionImpl>(std::move(new_soc)));
+        }
+    }
 
-	socket soc_;
-	acceptCallback accept_cb_;
+    socket soc_;
+    AcceptCallback accept_cb_;
 };
 }

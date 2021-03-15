@@ -4,102 +4,102 @@
 #include <memory>
 
 namespace psyche {
-class connection;
-class connection_wrapper;
+class ConnectionImpl;
+class ConnectionWrapper;
 class Server;
 
-using connection_ptr = std::shared_ptr<connection>;
-using Connection = connection_wrapper;
+using ConnectionPtr = std::shared_ptr<ConnectionImpl>;
+using Connection = ConnectionWrapper;
 
-using recvCallback = std::function<void(Connection, Buffer)>;
-using sendCallback = std::function<void(Connection)>;
-using closeCallback = std::function<void(Connection)>;
-using errorCallback = std::function<void(Connection, error_code)>;
+using RecvCallback = std::function<void(Connection, Buffer)>;
+using SendCallback = std::function<void(Connection)>;
+using CloseCallback = std::function<void(Connection)>;
+using ErrorCallback = std::function<void(Connection, ErrorCode)>;
 
-class connection:public std::enable_shared_from_this<connection>
+class ConnectionImpl:public std::enable_shared_from_this<ConnectionImpl>
 {
 public:
-	enum status
-	{
-		EMPTY,
-		CONNECTING,
-		CONNECTED,
-		TOBECLOSED,
+    enum Status
+    {
+        EMPTY,
+        CONNECTING,
+        CONNECTED,
+        TOBECLOSED,
         CLOSING,
-		CLOSED
-	};
+        CLOSED
+    };
 
-	connection(context& c, int fd);
-	connection(std::unique_ptr<socket>&& soc);
-	connection(const connection&) = delete;
-	connection(connection&& other) noexcept;
+    ConnectionImpl(context& c, int fd);
+    ConnectionImpl(std::unique_ptr<socket>&& soc);
+    ConnectionImpl(const ConnectionImpl&) = delete;
+    ConnectionImpl(ConnectionImpl&& other) noexcept;
 
-	void send(std::string msg, sendCallback cb);
-	virtual ~connection();
+    void send(std::string msg, SendCallback cb);
+    virtual ~ConnectionImpl();
 
-	auto getReadCallback() const { return recv_callback_; }
-	auto getWriteCallback() const { return send_callback_; }
-	auto getCloseCallback() const { return close_callback_; }
-	auto getErrorCallback() const { return error_callback_; }
+    auto get_read_callback() const { return recv_callback_; }
+    auto get_write_callback() const { return send_callback_; }
+    auto get_close_callback() const { return close_callback_; }
+    auto get_error_callback() const { return error_callback_; }
 
-	void setReadCallback(recvCallback cb);
-	void setWriteCallback(sendCallback cb);
-	void setCloseCallback(closeCallback cb);
+    void set_read_callback(RecvCallback cb);
+    void set_write_callback(SendCallback cb);
+    void set_close_callback(CloseCallback cb);
 
-	void close();
+    void close();
 
-	endpoint local_endpoint() const;
-	endpoint peer_endpoint() const;
+    endpoint local_endpoint() const;
+    endpoint peer_endpoint() const;
 
 protected:
-	virtual void invokeReadCallback();
-	virtual void invokeSendCallback();
-	virtual void invokeCloseCallback();
+    virtual void invoke_read_callback();
+    virtual void invoke_send_callback();
+    virtual void invoke_close_callback();
 
-	void handleRecv();
-	void handleSend();
-	void handleClose();
+    void handle_recv();
+    void handle_send();
+    void handle_close();
 
-	void shutdown();
+    void shutdown();
 
-	std::unique_ptr<socket> soc_;
+    std::unique_ptr<socket> soc_;
     std::mutex r_buf_mutex_, w_buf_mutex_;
-	std::unique_ptr<buffer_impl> read_buffer_;
-	std::unique_ptr<buffer_impl> write_buffer_;
-	status status_;
-	endpoint local_endpoint_;
-	endpoint peer_endpoint_;
-	recvCallback recv_callback_;
-	sendCallback send_callback_;
-	closeCallback close_callback_;
-	errorCallback error_callback_;
+    std::unique_ptr<BufferImpl> read_buffer_;
+    std::unique_ptr<BufferImpl> write_buffer_;
+    Status status_;
+    endpoint local_endpoint_;
+    endpoint peer_endpoint_;
+    RecvCallback recv_callback_;
+    SendCallback send_callback_;
+    CloseCallback close_callback_;
+    ErrorCallback error_callback_;
 };
 
-class connection_wrapper
+class ConnectionWrapper
 {
 public:
-	connection_wrapper(connection_ptr c);
-	connection_wrapper(const connection_wrapper& c);
-	connection_wrapper(connection_wrapper&& c) noexcept;
+    ConnectionWrapper(ConnectionPtr c);
+    ConnectionWrapper(const ConnectionWrapper& c);
+    ConnectionWrapper(ConnectionWrapper&& c) noexcept;
 
-    connection_wrapper& operator=(const connection_wrapper& other);
-    connection_wrapper& operator=(connection_wrapper&& other) noexcept;
+    ConnectionWrapper& operator=(const ConnectionWrapper& other);
+    ConnectionWrapper& operator=(ConnectionWrapper&& other) noexcept;
 
-	void send(std::string msg) const;
-	connection_ptr pointer() const;
+    void send(std::string msg) const;
+    ConnectionPtr pointer() const;
 
-	void setReadCallback(recvCallback cb) const;
-	void setWriteCallback(sendCallback cb) const;
-	void setCloseCallback(closeCallback cb) const;
+    void setReadCallback(RecvCallback cb) const;
+    void setWriteCallback(SendCallback cb) const;
+    void setCloseCallback(CloseCallback cb) const;
 
-	void close() const;
+    void close() const;
 
-	endpoint local_endpoint()const { return conn->local_endpoint(); }
-	endpoint peer_endpoint() const { return conn->peer_endpoint(); }
+    endpoint local_endpoint()const { return conn->local_endpoint(); }
+    endpoint peer_endpoint() const { return conn->peer_endpoint(); }
 
-	bool operator<(const connection_wrapper& other) const;
+    bool operator<(const ConnectionWrapper& other) const;
 
 private:
-	connection_ptr conn;
+    ConnectionPtr conn;
 };
 }

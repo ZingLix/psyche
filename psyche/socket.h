@@ -12,49 +12,49 @@ namespace psyche {
 class socket
 {
 public:
-	const int shutdown_rd = SHUT_RD;
-	const int shutdown_wr = SHUT_WR;
-	const int shutdown_both = SHUT_RDWR;
+    const int shutdown_rd = SHUT_RD;
+    const int shutdown_wr = SHUT_WR;
+    const int shutdown_both = SHUT_RDWR;
 
-	using readCallback = EventCallback;
-	using writeCallback = EventCallback;
-	using closeCallback = EventCallback;
+    using ReadCallback = EventCallback;
+    using WriteCallback = EventCallback;
+    using CloseCallback = EventCallback;
 
-	socket(context * c);
-	socket(context * c,int fd);
-	socket(const socket&) = delete;
-	socket(socket&& soc) noexcept = delete;
-	~socket();
-	void shutdown(int how) const;
-	void bind(const endpoint& ep) const;
-	void connect(const endpoint& ep) const;
-	void listen(int backlog=1000) const;
-	std::unique_ptr<socket> accept() const;
-	void close() const;
+    socket(context * c);
+    socket(context * c,int fd);
+    socket(const socket&) = delete;
+    socket(socket&& soc) noexcept = delete;
+    ~socket();
+    void shutdown(int how) const;
+    void bind(const endpoint& ep) const;
+    void connect(const endpoint& ep) const;
+    void listen(int backlog=1000) const;
+    std::unique_ptr<socket> accept() const;
+    void close() const;
 
-	endpoint local_endpoint() const;
-	endpoint peer_endpoint() const;
+    endpoint local_endpoint() const;
+    endpoint peer_endpoint() const;
 
-	context* get_context() { return context_; }
-	int fd() { return fd_; }
+    context* get_context() { return context_; }
+    int fd() { return fd_; }
 
-	void read(buffer_impl& buffer, readCallback);
-	void write(buffer_impl& buffer, writeCallback);
-	void handleClose();
+    void read(BufferImpl& buffer, ReadCallback);
+    void write(BufferImpl& buffer, WriteCallback);
+    void handle_close();
 
-	void setCloseCallback(std::function<void()>);
+    void set_close_callback(std::function<void()>);
 
-	void enableRead();
-	void disableRead();
-    void disableWrite();
+    void enable_read();
+    void disable_read();
+    void disable_write();
 
-	void reset();
+    void reset();
 private:
-	static inline sockaddr* sockaddr_cast(sockaddr_in& sock_in);
-	static inline sockaddr* sockaddr_cast(sockaddr_in* sock_in);
+    static inline sockaddr* sockaddr_cast(sockaddr_in& sock_in);
+    static inline sockaddr* sockaddr_cast(sockaddr_in* sock_in);
 
-	int fd_;
-	context* context_;
-	std::function<void()> cb;
+    int fd_;
+    context* context_;
+    std::function<void()> cb;
 };
 }

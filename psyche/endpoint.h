@@ -8,15 +8,15 @@ namespace psyche {
 class endpoint
 {
 public:
-	endpoint(const std::string& ip, std::uint16_t port);
-	endpoint(const sockaddr_in& sockaddr);
-	ip::address address() const;
-	std::uint16_t port() const;
-	std::string to_string() const;
-	sockaddr_in sockaddr() const;
+    endpoint(const std::string& ip, std::uint16_t port);
+    endpoint(const sockaddr_in& sockaddr);
+    ip::Address address() const;
+    std::uint16_t port() const;
+    std::string to_string() const;
+    sockaddr_in sockaddr() const;
 
 private:
-	ip::address address_;
-	std::uint16_t port_;
+    ip::Address address_;
+    std::uint16_t port_;
 };
 }
