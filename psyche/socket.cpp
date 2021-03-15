@@ -1,6 +1,6 @@
-#include "Socket.h"
-#include "Context.h"
-#include "Channel.h"
+#include "socket.h"
+#include "context.h"
+#include "channel.h"
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <cassert>

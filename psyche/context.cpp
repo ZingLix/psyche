@@ -1,5 +1,5 @@
-#include "Context.h"
-#include "Channel.h"
+#include "context.h"
+#include "channel.h"
 #include <cassert>
 using namespace psyche;
 

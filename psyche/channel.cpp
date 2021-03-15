@@ -1,4 +1,4 @@
-#include "Channel.h"
+#include "channel.h"
 #include "sys/epoll.h"
 
 using namespace psyche;

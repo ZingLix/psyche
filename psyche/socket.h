@@ -1,9 +1,9 @@
 #pragma once
 #include <sys/socket.h>
 #include <netinet/in.h>
-#include "Endpoint.h"
+#include "endpoint.h"
 #include <functional>
-#include "Context.h"
+#include "context.h"
 #include "buffer.h"
 #include "util.h"
 

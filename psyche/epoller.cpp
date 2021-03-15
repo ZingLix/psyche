@@ -1,5 +1,5 @@
-#include "Epoller.h"
-#include "Channel.h"
+#include "epoller.h"
+#include "channel.h"
 #include <cstring>
 
 using namespace psyche;

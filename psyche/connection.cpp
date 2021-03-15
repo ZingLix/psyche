@@ -1,5 +1,5 @@
 #include "connection.h"
-#include "Channel.h"
+#include "channel.h"
 #include "server.h"
 using namespace std::placeholders;
 

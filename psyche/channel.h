@@ -1,8 +1,8 @@
 #pragma once
 #include <functional>
 
-#include "Context.h"
-#include "Socket.h"
+#include "context.h"
+#include "socket.h"
 #include "util.h"
 
 namespace psyche {
