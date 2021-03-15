@@ -1,6 +1,6 @@
 #pragma once
-#include "socket.h"
-#include "channel.h"
+#include "Socket.h"
+#include "Channel.h"
 #include <functional>
 #include "connection.h"
 #include <memory>
@@ -11,7 +11,7 @@ class Acceptor
 public:
     using AcceptCallback = std::function<void(std::unique_ptr<ConnectionImpl>&&)>;
 
-    Acceptor(context& context,const endpoint ep):soc_(&context) {
+    Acceptor(Context& context,const Endpoint ep):soc_(&context) {
         soc_.bind(ep);
     }
 
@@ -33,7 +33,7 @@ private:
         }
     }
 
-    socket soc_;
+    Socket soc_;
     AcceptCallback accept_cb_;
 };
 }

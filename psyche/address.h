@@ -6,7 +6,7 @@ namespace psyche {
 namespace ip
 {
 
-using port = std::uint16_t;
+using Port = std::uint16_t;
 
 class Address
 {

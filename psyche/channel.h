@@ -1,16 +1,16 @@
 #pragma once
 #include <functional>
 
-#include "context.h"
-#include "socket.h"
+#include "Context.h"
+#include "Socket.h"
 #include "util.h"
 
 namespace psyche {
-class channel:std::enable_shared_from_this<channel>
+class Channel:std::enable_shared_from_this<Channel>
 {
 public:
 
-    channel(context* c, int fd);
+    Channel(Context* c, int fd);
 
     void set_read_callback(const EventCallback& cb);
     void set_write_callback(const EventCallback& cb);
@@ -40,7 +40,7 @@ private:
     static const int kReadEvent;
     static const int kWriteEvent;
 
-    context* context_;
+    Context* context_;
     const int fd_;
     int events_;
     int revents_;

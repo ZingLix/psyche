@@ -5,15 +5,15 @@
 
 namespace psyche {
 
-class context;
+class Context;
 
-class epoller
+class Epoller
 {
 public:
     static const int kEpollEvents = 100;
 
-    epoller(context* c);
-    ~epoller();
+    Epoller(Context* c);
+    ~Epoller();
     void add(int fd);
     void remove(int fd);
     void update(int fd, int events);
@@ -22,6 +22,6 @@ public:
 private:
     int epollfd_;
     std::array<epoll_event, kEpollEvents> events_;
-    context* context_;
+    Context* context_;
 };
 }

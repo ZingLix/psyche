@@ -2,7 +2,7 @@
 #include <csignal>
 #include <cassert>
 
-psyche::Server::Server(std::uint16_t port, const std::string& ip): acceptor_(context_, endpoint(ip, port)) {
+psyche::Server::Server(std::uint16_t port, const std::string& ip): acceptor_(context_, Endpoint(ip, port)) {
     acceptor_.accept([&](std::unique_ptr<ConnectionImpl>&& conn)
     {
         auto res = connections_.insert(std::make_shared<ConnectionImpl>(std::move(*conn)));

@@ -1,5 +1,5 @@
 #pragma once
-#include "socket.h"
+#include "Socket.h"
 #include <utility>
 #include <memory>
 
@@ -29,8 +29,8 @@ public:
         CLOSED
     };
 
-    ConnectionImpl(context& c, int fd);
-    ConnectionImpl(std::unique_ptr<socket>&& soc);
+    ConnectionImpl(Context& c, int fd);
+    ConnectionImpl(std::unique_ptr<Socket>&& soc);
     ConnectionImpl(const ConnectionImpl&) = delete;
     ConnectionImpl(ConnectionImpl&& other) noexcept;
 
@@ -48,8 +48,8 @@ public:
 
     void close();
 
-    endpoint local_endpoint() const;
-    endpoint peer_endpoint() const;
+    Endpoint local_endpoint() const;
+    Endpoint peer_endpoint() const;
 
 protected:
     virtual void invoke_read_callback();
@@ -62,13 +62,13 @@ protected:
 
     void shutdown();
 
-    std::unique_ptr<socket> soc_;
+    std::unique_ptr<Socket> soc_;
     std::mutex r_buf_mutex_, w_buf_mutex_;
     std::unique_ptr<BufferImpl> read_buffer_;
     std::unique_ptr<BufferImpl> write_buffer_;
     Status status_;
-    endpoint local_endpoint_;
-    endpoint peer_endpoint_;
+    Endpoint local_endpoint_;
+    Endpoint peer_endpoint_;
     RecvCallback recv_callback_;
     SendCallback send_callback_;
     CloseCallback close_callback_;
@@ -94,8 +94,8 @@ public:
 
     void close() const;
 
-    endpoint local_endpoint()const { return conn->local_endpoint(); }
-    endpoint peer_endpoint() const { return conn->peer_endpoint(); }
+    Endpoint local_endpoint()const { return conn->local_endpoint(); }
+    Endpoint peer_endpoint() const { return conn->peer_endpoint(); }
 
     bool operator<(const ConnectionWrapper& other) const;
 

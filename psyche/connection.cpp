@@ -1,5 +1,5 @@
 #include "connection.h"
-#include "channel.h"
+#include "Channel.h"
 #include "server.h"
 using namespace std::placeholders;
 
@@ -31,7 +31,7 @@ void psyche::ConnectionImpl::set_close_callback(CloseCallback cb) {
     close_callback_ = cb;
 }
 
-psyche::endpoint psyche::ConnectionImpl::peer_endpoint() const { return peer_endpoint_; }
+psyche::Endpoint psyche::ConnectionImpl::peer_endpoint() const { return peer_endpoint_; }
 
 void psyche::ConnectionImpl::invoke_read_callback() {
     if (recv_callback_) 
@@ -107,8 +107,8 @@ void psyche::ConnectionImpl::shutdown() {
 }
 
 
-psyche::ConnectionImpl::ConnectionImpl(context& c, int fd)
-    : soc_(std::make_unique<socket>(&c, fd)),
+psyche::ConnectionImpl::ConnectionImpl(Context& c, int fd)
+    : soc_(std::make_unique<Socket>(&c, fd)),
     read_buffer_(std::make_unique<BufferImpl>()),
     write_buffer_(std::make_unique<BufferImpl>()),
     status_(CONNECTED),
@@ -117,7 +117,7 @@ psyche::ConnectionImpl::ConnectionImpl(context& c, int fd)
 {
 }
 
-psyche::ConnectionImpl::ConnectionImpl(std::unique_ptr<socket>&& soc)
+psyche::ConnectionImpl::ConnectionImpl(std::unique_ptr<Socket>&& soc)
     : soc_(std::move(soc)),
     read_buffer_(std::make_unique<BufferImpl>()),
     write_buffer_(std::make_unique<BufferImpl>()),
@@ -148,7 +148,7 @@ void psyche::ConnectionImpl::close() {
     }
 }
 
-psyche::endpoint psyche::ConnectionImpl::local_endpoint() const {
+psyche::Endpoint psyche::ConnectionImpl::local_endpoint() const {
     return local_endpoint_;
 }
 

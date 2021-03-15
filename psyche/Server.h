@@ -33,7 +33,7 @@ private:
     void handle_write(Connection con) const;
     void handle_close(Connection con);
 
-    context context_;
+    Context context_;
     Acceptor acceptor_;
     std::set<ConnectionPtr> connections_;
 

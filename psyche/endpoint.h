@@ -5,11 +5,11 @@
 
 namespace psyche {
 
-class endpoint
+class Endpoint
 {
 public:
-    endpoint(const std::string& ip, std::uint16_t port);
-    endpoint(const sockaddr_in& sockaddr);
+    Endpoint(const std::string& ip, std::uint16_t port);
+    Endpoint(const sockaddr_in& sockaddr);
     ip::Address address() const;
     std::uint16_t port() const;
     std::string to_string() const;
