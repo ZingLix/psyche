@@ -3,7 +3,7 @@
 
 # psyche
 
-[![Build Status](https://travis-ci.com/ZingLix/psyche.svg?branch=master)](https://travis-ci.com/ZingLix/psyche)
+[![Build Status](https://travis-ci.com/ZingLix/psyche.svg?branch=master)](https://travis-ci.com/ZingLix/psyche) ![github actions badge](https://github.com/ZingLix/psyche/actions/workflows/cmake.yml/badge.svg)
 
 psyche is a non-blocking network library for Linux developed with C++17 and provides several components.
 
