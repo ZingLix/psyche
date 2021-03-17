@@ -10,6 +10,9 @@ Address::Address(const std::string& address): addr_() {
     init(address.c_str());
 }
 
+Address::Address(const uint32_t address): addr_(address) {
+}
+
 std::string Address::to_string() const {
     char ip[INET_ADDRSTRLEN];
     inet_ntop(AF_INET, &addr_, ip, sizeof(ip));

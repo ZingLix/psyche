@@ -15,6 +15,14 @@ void psyche::ConnectionImpl::send(const std::string& msg, SendCallback cb) {
 
 psyche::ConnectionImpl::~ConnectionImpl() = default;
 
+auto psyche::ConnectionImpl::get_read_callback() const { return recv_callback_; }
+
+auto psyche::ConnectionImpl::get_write_callback() const { return send_callback_; }
+
+auto psyche::ConnectionImpl::get_close_callback() const { return close_callback_; }
+
+auto psyche::ConnectionImpl::get_error_callback() const { return error_callback_; }
+
 void psyche::ConnectionImpl::set_read_callback(RecvCallback cb) {
     soc_->read(*read_buffer_, [this]() { this->handle_recv(); });
     recv_callback_ = std::move(cb);

@@ -1,6 +1,8 @@
 #include "server.h"
+#include "exception.h"
+#include "log.h"
 
-psyche::Server::Server(std::uint16_t port, const std::string& ip): acceptor_(context_, Endpoint(ip, port)) {
+psyche::Server::Server(std::uint16_t port, const std::string& ip) try: acceptor_(context_, Endpoint(ip, port)) {
     acceptor_.accept([&](std::unique_ptr<ConnectionImpl>&& conn)
     {
         auto res = connections_.insert(std::make_shared<ConnectionImpl>(std::move(*conn)));
@@ -13,6 +15,9 @@ psyche::Server::Server(std::uint16_t port, const std::string& ip): acceptor_(con
         c->set_close_callback(std::bind(&Server::handle_close, this, _1));
         if (new_conn_callback_) new_conn_callback_(c);
     });
+}catch (psyche::ErrnoException e) {
+    const auto error_msg = e.what();
+    throw std::runtime_error(error_msg);
 }
 
 void psyche::Server::set_new_conn_callback(NewConnCallback cb) {

@@ -12,27 +12,12 @@ class Acceptor
 public:
     using AcceptCallback = std::function<void(std::unique_ptr<ConnectionImpl>&&)>;
 
-    Acceptor(Context& context, const Endpoint ep): soc_(&context) {
-        soc_.bind(ep);
-    }
+    Acceptor(Context& context, Endpoint ep);
 
-    void accept(const AcceptCallback& cb, const int backlog = 1000) {
-        soc_.listen(backlog);
-        using namespace std::placeholders;
-        soc_.get_context()->set_read_callback(soc_.fd(), [this]() { this->handle_new_connection(); }
-        );
-        accept_cb_ = cb;
-        soc_.get_context()->get_channel(soc_.fd())->enable_reading();
-    }
+    void accept(const AcceptCallback& cb, int backlog = 1000);
 
 private:
-    void handle_new_connection() const {
-        //if (ec) throw;
-        auto new_soc = soc_.accept();
-        if (accept_cb_) {
-            accept_cb_(std::make_unique<ConnectionImpl>(std::move(new_soc)));
-        }
-    }
+    void handle_new_connection() const;
 
     Socket soc_;
     AcceptCallback accept_cb_;

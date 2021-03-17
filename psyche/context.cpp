@@ -1,5 +1,7 @@
 #include "context.h"
 #include "channel.h"
+#include "exception.h"
+#include "log.h"
 #include <cassert>
 using namespace psyche;
 
@@ -22,15 +24,19 @@ void Context::update_poller(int fd, int events) const {
 void Context::run() {
     running_ = true;
     quit_ = false;
-    while (!quit_) {
-        fd_list_.clear();
-        epoller_->poll(fd_list_);
-        for (auto fd : fd_list_) {
-            auto it = channel_map_.find(fd);
-            if (it != channel_map_.end())
-                it->second->handle_event();
-            //			channel_map_[it].handle_event();
+    try {
+        while (!quit_) {
+            fd_list_.clear();
+            epoller_->poll(fd_list_);
+            for (auto fd : fd_list_) {
+                auto it = channel_map_.find(fd);
+                if (it != channel_map_.end())
+                    it->second->handle_event();
+                //			channel_map_[it].handle_event();
+            }
         }
+    }catch (ErrnoException e) {
+        LOG_ERROR << e.what();
     }
     running_ = false;
 }

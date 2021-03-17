@@ -14,8 +14,7 @@ public:
     Address(const char* address);
     Address(const std::string& address);
 
-    Address(const uint32_t address) : addr_(address) {
-    }
+    explicit Address(const uint32_t address);
 
     [[nodiscard]]
     std::string to_string() const;

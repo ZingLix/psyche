@@ -1,17 +1,20 @@
 #include "socket.h"
 
 #include <unistd.h>
-
-#include "context.h"
-#include "channel.h"
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
+
+#include "context.h"
+#include "channel.h"
+#include "log.h"
+#include "exception.h"
 
 using namespace psyche;
 
 Socket::Socket(Context* c)
     : fd_(socket(AF_INET,SOCK_STREAM, 0)), context_(c) {
+    check_errno(fd_);
     using namespace std::placeholders;
     int opt = 1;
     setsockopt(fd_, SOL_SOCKET, SO_REUSEADDR,
@@ -29,8 +32,8 @@ Socket::Socket(Context* c)
 
 Socket::~Socket() {
     if (fd_ != 0) {
-        close();
         context_->remove_channel(fd_);
+        close();
         fd_ = 0;
     }
 }
@@ -39,39 +42,36 @@ void Socket::reset() {
     fd_ = 0;
 }
 
-Socket::Socket(Context* c, int fd)
+Socket::Socket(Context* c, const int fd)
     : fd_(fd), context_(c) {
-    using namespace std::placeholders;
     c->add_channel(fd_);
     c->get_channel(fd_)->enable_reading();
     c->get_channel(fd_)->set_close_callback([this]() { this->handle_close(); });
 }
 
 void Socket::shutdown(int how) const {
-    ::shutdown(fd_, how);
+    check_errno(::shutdown(fd_, how));
 }
 
 void Socket::bind(const Endpoint& ep) const {
     auto sockaddr = ep.sockaddr();
-    ::bind(fd_, sockaddr_cast(sockaddr), sizeof(sockaddr));
+    check_errno(::bind(fd_, sockaddr_cast(sockaddr), sizeof(sockaddr)));
 }
 
 void Socket::connect(const Endpoint& ep) const {
     auto sockaddr_ = ep.sockaddr();
-    ::connect(fd_, sockaddr_cast(sockaddr_), sizeof(sockaddr_));
+    check_errno(::connect(fd_, sockaddr_cast(sockaddr_), sizeof(sockaddr_)));
 }
 
 void Socket::listen(int backlog) const {
-    ::listen(fd_, backlog);
+    check_errno(::listen(fd_, backlog));
 }
 
 std::unique_ptr<Socket> Socket::accept() const {
     sockaddr_in addr{};
     socklen_t len = sizeof(addr);
     auto fd = accept4(fd_, sockaddr_cast(addr), &len, SOCK_NONBLOCK | SOCK_CLOEXEC);
-    if (fd == -1) {
-        throw std::runtime_error(std::to_string(errno));
-    }
+    check_errno(fd);
     return std::make_unique<Socket>(context_, fd);
 }
 
