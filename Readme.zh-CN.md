@@ -2,7 +2,7 @@
 
 # psyche
 
-[![Build Status](https://travis-ci.com/ZingLix/psyche.svg?branch=master)](https://travis-ci.com/ZingLix/psyche)
+[![Build Status](https://travis-ci.com/ZingLix/psyche.svg?branch=master)](https://travis-ci.com/ZingLix/psyche) ![github actions badge](https://github.com/ZingLix/psyche/actions/workflows/cmake.yml/badge.svg)
 
 psyche 是在 Linux 下利用 C++17 开发的异步非阻塞式网络库，提供如下组件
 
